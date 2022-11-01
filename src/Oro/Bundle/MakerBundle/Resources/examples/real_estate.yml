@@ -1,0 +1,156 @@
+generate:
+    options:
+        organization: oro
+        package: real_estate
+    entities:
+        home:
+            configuration:
+                owner: user
+            fields:
+                title:
+                    type: string
+                    required: true
+                    max_length: 255
+                city:
+                    type: string
+                    required: true
+                address:
+                    type: text
+                address_description_page:
+                    type: '@Oro\Bundle\CMSBundle\Entity\Page'
+                poster:
+                    type: image
+                price:
+                    type: float
+                    required: true
+                deposit:
+                    type: float
+                square_m2:
+                    type: integer
+                rooms:
+                    type: enum
+                    values:
+                        - 1
+                        - 2
+                        - 3
+                        - 4
+                        - More than 4
+                seller_type:
+                    type: enum
+                    values:
+                        - Direct
+                        - Agency
+                brief_description:
+                    type: html
+                detailed_description:
+                    type: wysiwyg
+                allow_rent_by_students:
+                    type: boolean
+                build_year:
+                    type: enum
+                    values:
+                        - 'Older than 1940'
+                        - '1940 - 1960'
+                        - '1960 - 1980'
+                        - '1980 - 1990'
+                        - '1980 - 1990'
+                        - '1990 - 2000'
+                        - '2000 - 2010'
+                        - '2010 and newer'
+                floor:
+                    type: integer
+                number_of_floors:
+                    type: integer
+                windows_material:
+                    type: enum
+                    values:
+                        - Wood
+                        - Plastic
+                heat_type:
+                    type: enum
+                    values:
+                        - Centralized
+                        - Gas
+                        - Coal
+                        - Other
+                available_since:
+                    type: date
+                equipment:
+                    type: enum[]
+                    values:
+                        - Furniture
+                        - Refrigerator
+                        - TV
+                        - Washing machine
+                        - Dishwasher
+                        - Owen
+                        - Microwave oven
+                exclusive_seller:
+                    type: '@seller'
+                sold_by:
+                    type: '@seller[]'
+                    relation_type: many-to-many
+                buyers:
+                    type: relation
+                    relation_type: many-to-many
+                    relation_target: 'Oro\Bundle\CustomerBundle\Entity\CustomerUser'
+                related_products:
+                    type: relation
+                    relation_type: one-to-many
+                    relation_target: 'Oro\Bundle\ProductBundle\Entity\Product'
+                view_requests:
+                    type: '@view_request[]'
+        seller:
+            configuration:
+                owner: user
+            fields:
+                title:
+                    type: string
+                    required: true
+                name_prefix:
+                    type: string
+                first_name:
+                    type: string
+                middle_name:
+                    type: string
+                last_name:
+                    type: string
+                name_suffix:
+                    type: string
+                contact_email:
+                    type: email
+                contact_phone:
+                    type: string
+                    required: true
+                is_private_person:
+                    type: boolean
+                about:
+                    type: html
+                contacts:
+                    type: relation
+                    relation_type: many-to-many
+                    relation_target: 'Oro\Bundle\ContactBundle\Entity\Contact'
+                moderated_by:
+                    type: relation
+                    relation_type: many-to-many
+                    relation_target: 'Oro\Bundle\UserBundle\Entity\User'
+                    is_owning_side: false
+        view_request:
+            configuration:
+                is_related_entity: true
+                owner: organization
+                frontend_owner: customer_user
+            fields:
+                proposal_text:
+                    type: text
+                    required: true
+                    force_show_on_grid: true
+                    max_length: 1024
+                proposed_price:
+                    type: float
+                visit_date:
+                    type: datetime
+                contact_phone:
+                    type: string
+                contact_person:
+                    type: string

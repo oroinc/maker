@@ -1,0 +1,41 @@
+services:
+    Oro\Bundle\MakerBundle\Helper\EntityInstallerHelper: ~
+    Oro\Bundle\MakerBundle\Renderer\CodeStyleFixer:
+        arguments:
+            - '%kernel.project_dir%'
+
+    Oro\Bundle\MakerBundle\Helper\GridHelper:
+        arguments:
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_datagrid.configuration.provider'
+
+    Oro\Bundle\MakerBundle\Helper\OroEntityHelper:
+        arguments:
+            - '@Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer'
+            - '@maker.file_manager'
+
+    Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer: ~
+
+    Oro\Bundle\MakerBundle\Factory\FileManagerFactory:
+        arguments:
+            - '@filesystem'
+            - '@maker.autoloader_util'
+            - '@maker.file_link_formatter'
+
+    Oro\Bundle\MakerBundle\Factory\GeneratorFactory:
+        arguments:
+            - '@maker.php_compat_util'
+            - '@maker.template_component_generator'
+
+    Oro\Bundle\MakerBundle\Maker\MakeByConfig:
+        arguments:
+            - '@Oro\Bundle\MakerBundle\Factory\GeneratorFactory'
+            - '@Oro\Bundle\MakerBundle\Factory\FileManagerFactory'
+            - '@Oro\Bundle\MakerBundle\Helper\OroEntityHelper'
+            - '@Oro\Bundle\MakerBundle\Generator\ChainGenerator'
+            - '@Oro\Bundle\MakerBundle\Renderer\CodeStyleFixer'
+            - '@maker.file_manager'
+            - '%kernel.project_dir%'
+            - !tagged_iterator { tag: 'oro.maker.metadata_loader' }
+        tags:
+            - { name: maker.command }

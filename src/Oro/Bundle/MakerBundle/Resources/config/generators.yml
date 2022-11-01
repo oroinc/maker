@@ -1,0 +1,72 @@
+services:
+    Oro\Bundle\MakerBundle\Generator\ChainGenerator:
+        arguments:
+            - !tagged_iterator { tag: 'oro.maker.generator' }
+
+    Oro\Bundle\MakerBundle\Generator\BundleGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -10 }
+
+    Oro\Bundle\MakerBundle\Generator\DoctrineEntityGenerator:
+        arguments:
+            - '@Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer'
+            - '@Oro\Bundle\MakerBundle\Helper\EntityInstallerHelper'
+            - '@Oro\Bundle\MakerBundle\Helper\OroEntityHelper'
+        tags:
+            - { name: 'oro.maker.generator', priority: -20 }
+
+    Oro\Bundle\MakerBundle\Generator\ValidatorGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -30 }
+
+    Oro\Bundle\MakerBundle\Generator\TranslationGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -40 }
+
+    Oro\Bundle\MakerBundle\Generator\GridGenerator:
+        arguments:
+            - '@Oro\Bundle\MakerBundle\Helper\GridHelper'
+        tags:
+            - { name: 'oro.maker.generator', priority: -50 }
+
+    Oro\Bundle\MakerBundle\Generator\SearchGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -60 }
+
+    Oro\Bundle\MakerBundle\Generator\AclGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -70 }
+
+    Oro\Bundle\MakerBundle\Generator\FormGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -80 }
+
+    Oro\Bundle\MakerBundle\Generator\ControllerGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -90 }
+
+    Oro\Bundle\MakerBundle\Generator\EntityViewPageListenerGenerator:
+        arguments:
+            - '@maker.autoloader_finder'
+        tags:
+            - { name: 'oro.maker.generator', priority: -100 }
+
+    Oro\Bundle\MakerBundle\Generator\ActionsGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -110 }
+
+    Oro\Bundle\MakerBundle\Generator\MenuGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -120 }
+
+    Oro\Bundle\MakerBundle\Generator\ImportExportGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -130 }
+
+    Oro\Bundle\MakerBundle\Generator\ApiGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -140 }
+
+    Oro\Bundle\MakerBundle\Generator\DiExtensionGenerator:
+        tags:
+            - { name: 'oro.maker.generator', priority: -150 }

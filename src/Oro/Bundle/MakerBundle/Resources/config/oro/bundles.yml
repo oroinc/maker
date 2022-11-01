@@ -1,0 +1,3 @@
+bundles:
+    - Symfony\Bundle\MakerBundle\MakerBundle
+    - Oro\Bundle\MakerBundle\OroMakerBundle

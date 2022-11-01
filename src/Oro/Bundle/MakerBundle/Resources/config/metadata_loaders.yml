@@ -1,0 +1,31 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro.maker.metadata_loader }
+
+    Oro\Bundle\MakerBundle\Metadata\TitleMetadataLoader: ~
+
+    Oro\Bundle\MakerBundle\Metadata\TableNameMetadataLoader:
+        arguments:
+            - '@maker.doctrine_helper'
+
+    Oro\Bundle\MakerBundle\Metadata\IdInfoMetadataLoader:
+        arguments:
+            - '@maker.doctrine_helper'
+
+    Oro\Bundle\MakerBundle\Metadata\EntityFieldsMetadataLoader:
+        arguments:
+            - '@maker.doctrine_helper'
+
+    Oro\Bundle\MakerBundle\Metadata\SelectFormTypeMetadataLoader:
+        arguments:
+            - '@oro_entity_config.provider.form'
+
+    Oro\Bundle\MakerBundle\Metadata\RouteMetadataLoader:
+        arguments:
+            - '@oro_entity_config.config_manager'
+
+    Oro\Bundle\MakerBundle\Metadata\GridNameMetadataLoader:
+        arguments:
+            - '@oro_entity_config.provider.grid'
+            - '@oro_entity_config.provider.form'

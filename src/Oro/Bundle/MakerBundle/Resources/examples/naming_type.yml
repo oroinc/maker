@@ -1,0 +1,15 @@
+generate:
+    options:
+        organization: acme
+        package: example
+    entities:
+        user_naming_type:
+            configuration:
+                owner: user
+            fields:
+                format:
+                    type: string
+                user:
+                    type: relation
+                    relation_type: one-to-many
+                    relation_target: 'Oro\Bundle\UserBundle\Entity\User'
