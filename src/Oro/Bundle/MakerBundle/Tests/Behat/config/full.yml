@@ -1,0 +1,104 @@
+generate:
+    options:
+        organization: acme
+        package: example
+    entities:
+        entity_one:
+            configuration:
+                owner: user
+            fields:
+                integer_field:
+                    type: integer
+                float_field:
+                    type: float
+                decimal_field:
+                    type: decimal
+                smallint_field:
+                    type: smallint
+                bigint_field:
+                    type: bigint
+                string_field:
+                    type: string
+                    required: true
+                    min_length: 2
+                    max_length: 10
+                text_field:
+                    type: text
+                    disable_data_audit: true
+                    disable_import_export: true
+                image_field:
+                    type: image
+                enum_field:
+                    type: enum
+                    values:
+                        - 1
+                        - 2
+                        - More than 2
+                multienum_field:
+                    type: enum[]
+                    values:
+                        - Furniture
+                        - Refrigerator
+                        - TV
+                date_field:
+                    type: date
+                datetime_field:
+                    type: datetime
+                boolean_field:
+                    type: boolean
+                html_field:
+                    type: html
+                wysiwyg_field:
+                    type: wysiwyg
+                many_to_one_internal_relation:
+                    type: '@entity_two'
+                many_to_many_internal_relation:
+                    type: '@entity_two[]'
+                    relation_type: many-to-many
+                one_to_many_external_relation:
+                    type: relation
+                    relation_type: one-to-many
+                    relation_target: 'Oro\Bundle\ProductBundle\Entity\Product'
+                many_to_many_external_relation:
+                    type: relation
+                    relation_type: many-to-many
+                    relation_target: 'Oro\Bundle\CustomerBundle\Entity\Customer'
+                entity_without_cruds:
+                    type: '@entity_without_crud[]'
+                many_to_one_external_relation:
+                    type: '@Oro\Bundle\UserBundle\Entity\User'
+        entity_two:
+            configuration:
+                owner: user
+            fields:
+                name_prefix:
+                    type: string
+                first_name:
+                    type: string
+                middle_name:
+                    type: string
+                last_name:
+                    type: string
+                name_suffix:
+                    type: string
+                email_field:
+                    type: email
+                phone_field:
+                    type: string
+                related_user:
+                    type: relation
+                    relation_type: many-to-many
+                    relation_target: 'Oro\Bundle\UserBundle\Entity\User'
+                    is_owning_side: false
+        entity_without_crud:
+            configuration:
+                is_related_entity: true
+                owner: organization
+                frontend_owner: customer_user
+            fields:
+                text_field:
+                    type: text
+                    required: true
+                    force_show_on_grid: true
+                percent_field:
+                    type: percent

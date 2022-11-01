@@ -1,0 +1,73 @@
+oro_behat_extension:
+  elements:
+    Entity One Form:
+      selector: 'form[name="entity_one"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          DateTime Field:
+            type: 'css'
+            locator: '[name="entity_one[datetimeField]"]'
+          Wysiwyg Field:
+            type: 'css'
+            locator: '[name="entity_one[wysiwygField]"]'
+            class: Oro\Bundle\CMSBundle\Tests\Behat\Element\WysiwygField
+    Entity Two Form:
+      selector: 'form[name="entity_two"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+    EntityWithoutCrudGrid:
+      selector: '[id^="grid-acme-example-entity-without-crud-grid-by-entity-one"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    EntityTwoCrudGrid:
+      selector: '[id^="grid-acme-example-entity-two-grid-by-many-to-many-internal-relation-entity-ones"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    UserRelationEntityTwoGrid:
+      selector: '[id^="grid-acme-example-entity-two-grid-by-related-user"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    EntityOneCustomerMMRelationGrid:
+      selector: '[id^="grid-customer-customers-select-grid-by-entity-ones"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    CustomerEntityOneMMRelationGrid:
+      selector: '[id^="grid-acme-example-entity-one-grid-by-many-to-many-external-relation"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    UserEntityTwoMMRelationGrid:
+      selector: '[id^="grid-users-grid-by-entity-twos"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    UserEntityOneMORelationGrid:
+      selector: '[id^="grid-acme-example-entity-one-grid-by-many-to-one-external-relation"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    EntityOneGrid:
+      selector: '[id^="grid-acme-example-entity-one-grid-select"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    EntityTwoEntityOneMMrelation:
+      selector: '[id^="grid-acme-example-entity-one-grid-by-many-to-many-internal-relation"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    EntityOneproductOMrelation:
+      selector: '[id^="grid-products-select-grid-by-entity-one"]'
+      class: Oro\Bundle\FrontendBundle\Tests\Behat\Element\Grid
+    EntityOperationForm:
+      selector: 'form[name="oro_action_operation"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          OperationEntity:
+            type: 'css'
+            locator: '[name="oro_action_operation[entity]"]'
+            class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity
+    ManyToOneExternalRelationViewLink:
+      selector:
+        type: 'xpath'
+        locator: '//label[contains(text(),"Many To One External Relation")]//following-sibling::div//a'
+  suites:
+    OroMakerBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentImageContext
+        - Oro\Bundle\QueryDesignerBundle\Tests\Behat\Context\QueryDesignerContext
+        - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
+      paths:
+        - '@OroMakerBundle/Tests/Behat/Features'

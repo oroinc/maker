@@ -1,0 +1,32 @@
+{
+  "name": "oro/maker",
+  "description": "Code generation/makers for Oro platform",
+  "license": "OSL-3.0",
+  "authors": [
+    {
+      "name": "Oro, Inc",
+      "homepage": "https://www.orocommerce.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {"Oro\\Bundle\\MakerBundle\\": "src/Oro/Bundle/MakerBundle"},
+    "exclude-from-classmap": ["/Tests/"]
+  },
+  "require": {
+    "oro/platform": "5.1.*",
+    "symfony/maker-bundle": "1.39"
+  },
+  "repositories": {
+    "oro": {
+      "type": "composer",
+      "url": "https://packagist.orocrm.com"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "extra": {
+    "branch-alias": {
+      "dev-master": "5.1-dev"
+    }
+  }
+}
