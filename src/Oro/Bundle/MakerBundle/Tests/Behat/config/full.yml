@@ -17,7 +17,7 @@ generate:
                     type: smallint
                 bigint_field:
                     type: bigint
-                string_field:
+                stringField:
                     type: string
                     required: true
                     min_length: 2
