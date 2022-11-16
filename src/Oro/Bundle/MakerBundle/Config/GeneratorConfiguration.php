@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MakerBundle\Config;
 
+use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -35,8 +36,28 @@ class GeneratorConfiguration implements ConfigurationInterface
 
     public function processConfiguration(array $config): array
     {
-        return (new Processor())
-            ->processConfiguration($this, $config);
+        $processedConfig = (new Processor())->processConfiguration($this, $config);
+
+        // Normalize field and entity names to be in snake_case.
+        foreach ($processedConfig['entities'] as $entityName => &$entityData) {
+            foreach ($entityData['fields'] as $fieldName => $fieldData) {
+                $nameNormalized = strtolower(Str::asSnakeCase($fieldName));
+                if ($nameNormalized === $fieldName) {
+                    continue;
+                }
+                $entityData['fields'][$nameNormalized] = $fieldData;
+                unset($entityData['fields'][$fieldName]);
+            }
+
+            $nameNormalized = strtolower(Str::asSnakeCase($entityName));
+            if ($nameNormalized === $entityName) {
+                continue;
+            }
+            $processedConfig['entities'][$nameNormalized] = $entityData;
+            unset($processedConfig['entities'][$entityName]);
+        }
+
+        return $processedConfig;
     }
 
     public function getConfigTreeBuilder()

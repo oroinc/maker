@@ -64,7 +64,7 @@ class FormGenerator implements GeneratorInterface
         array $entityConfig
     ): string {
         $shortName = Str::asCamelCase($entityName);
-        if (str_ends_with($shortName, 'Type')) {
+        if (str_ends_with(strtolower($shortName), 'type')) {
             $shortName .= 'Form';
         }
 
