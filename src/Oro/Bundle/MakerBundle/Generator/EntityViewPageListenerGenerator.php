@@ -83,7 +83,7 @@ class EntityViewPageListenerGenerator implements GeneratorInterface
                 );
             }
 
-            $generator->generateFile(
+            $generator->generateOrModifyYamlFile(
                 LocationMapper::getServicesConfigPath($srcPath, 'event_listeners.yml'),
                 __DIR__ . '/../Resources/skeleton/crud/event_listeners.yml.tpl.php',
                 [

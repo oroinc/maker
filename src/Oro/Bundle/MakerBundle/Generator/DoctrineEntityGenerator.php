@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\MakerBundle\Generator;
 
+use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\PhpNamespace;
+use Nette\PhpGenerator\PsrPrinter;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MakerBundle\Helper\CrudHelper;
 use Oro\Bundle\MakerBundle\Helper\EntityDependencyHelper;
@@ -10,9 +14,11 @@ use Oro\Bundle\MakerBundle\Helper\OroEntityConfigHelper;
 use Oro\Bundle\MakerBundle\Helper\OroEntityHelper;
 use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
 use Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer;
+use Oro\Bundle\MakerBundle\Util\FileManager;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
+use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 
 /**
  * Generates doctrine entities and repository classes for them.
@@ -155,13 +161,15 @@ class DoctrineEntityGenerator implements GeneratorInterface
         }
         unset($entityConfig);
 
-        $generator->generateFile(
-            LocationMapper::getServicesConfigPath($srcPath, 'repositories.yml'),
-            __DIR__ . '/../Resources/skeleton/doctrine/repositories.yml.tpl.php',
-            [
-                'repositories' => $repositories
-            ]
-        );
+        if ($repositories) {
+            $generator->generateOrModifyYamlFile(
+                LocationMapper::getServicesConfigPath($srcPath, 'repositories.yml'),
+                __DIR__ . '/../Resources/skeleton/doctrine/repositories.yml.tpl.php',
+                [
+                    'repositories' => $repositories
+                ]
+            );
+        }
 
         $generator->writeChanges();
 
@@ -194,34 +202,131 @@ class DoctrineEntityGenerator implements GeneratorInterface
             $migrationNamespace = 'Migrations\\Schema';
         }
 
-        $installerClassNameDetails = $generator->createClassNameDetails(
-            $bundlePrefix,
-            $migrationNamespace,
-            'Installer'
-        );
-
         $traits = [];
-        $interfaces = [
-            'Oro\Bundle\MigrationBundle\Migration\Installation'
-        ];
+        $interfaces = [];
         $uses = [
             'Doctrine\DBAL\Schema\Schema',
             'Oro\Bundle\MigrationBundle\Migration\QueryBag',
             'Oro\Bundle\EntityExtendBundle\Migration\OroOptions'
         ];
         $this->installerHelper->configureTraitsAndInterfaces($configData, $traits, $interfaces, $uses);
-        $generator->generateClass(
-            $installerClassNameDetails->getFullName(),
-            __DIR__ . '/../Resources/skeleton/doctrine/installer.tpl.php',
-            [
-                'tables_config' => $this->installerHelper->getTablesConfig($configData['entities'], $uses),
-                'requires_extend_extension' => $this->installerHelper
-                    ->isExtendExtensionRequired($configData['entities']),
-                'uses' => array_unique($uses),
-                'traits' => array_unique($traits),
-                'interfaces' => array_unique($interfaces)
-            ]
+        $templateVars = [
+            'tables_config' => $this->installerHelper->getTablesConfig($configData['entities'], $uses),
+            'requires_extend_extension' => $this->installerHelper
+                ->isExtendExtensionRequired($configData['entities']),
+            'uses' => array_unique($uses),
+            'traits' => array_unique($traits),
+            'interfaces' => array_unique($interfaces)
+        ];
+        $this->writeInstaller($generator, $templateVars, $migrationNamespace, $bundlePrefix);
+    }
+
+    private function writeInstaller(
+        Generator $generator,
+        array $templateVars,
+        string $migrationNamespace,
+        string $bundlePrefix
+    ): void {
+        $installerClassNameDetails = $generator->createClassNameDetails(
+            $bundlePrefix,
+            $migrationNamespace,
+            'Installer'
         );
+        /** @var FileManager $fileManager */
+        $fileManager = $generator->getFileManager();
+        $installerPath = $fileManager->getRelativePathForFutureClass($installerClassNameDetails->getFullName());
+        if ($fileManager->fileExists($installerPath)) {
+            $calls = $fileManager->parseTemplate(
+                __DIR__ . '/../Resources/skeleton/doctrine/include/installer_calls.tpl.php',
+                $templateVars
+            );
+
+            $classContents = $fileManager->getFileContents($installerPath);
+
+            $file = PhpFile::fromCode($classContents);
+            $classes = $file->getClasses();
+            /** @var ClassType $class */
+            $class = reset($classes);
+            // Append new up calls after execution of existing calls
+            $existingCalls = $class->getMethod('up')->getBody();
+            $class->getMethod('up')->setBody($existingCalls . PHP_EOL . $calls);
+
+            // Increase migration version
+            preg_match('/v(\d[\d_]+\d)/', $class->getMethod('getMigrationVersion')->getBody(), $matches);
+            $versionData = explode('_', $matches[1]);
+            $versionData[array_key_last($versionData)]++;
+            $newVersion = 'v' . implode('_', $versionData);
+            $class->getMethod('getMigrationVersion')->setBody(sprintf("return '%s';", $newVersion));
+
+            // Generate migration script
+            $migrationClassNameDetails = $generator->createClassNameDetails(
+                'AddNewTablesTo',
+                $migrationNamespace . '\\' . $newVersion,
+                $bundlePrefix
+            );
+            $migrationVars = $templateVars;
+            array_unshift($migrationVars['interfaces'], 'Oro\Bundle\MigrationBundle\Migration\Migration');
+            $generator->generateClass(
+                $migrationClassNameDetails->getFullName(),
+                __DIR__ . '/../Resources/skeleton/doctrine/migration.tpl.php',
+                $migrationVars
+            );
+
+            // Add not present use, implements and traits
+            $namespaces = $file->getNamespaces();
+            /** @var PhpNamespace $namespace */
+            $namespace = reset($namespaces);
+            foreach ($templateVars['uses'] as $use) {
+                if (!str_contains($classContents, $use . ';')) {
+                    $namespace->addUse($use);
+                }
+            }
+            foreach ($templateVars['interfaces'] as $interface) {
+                if (!str_contains($classContents, $interface . ';')) {
+                    $namespace->addUse($interface);
+                    $class->addImplement($interface);
+                }
+            }
+            foreach ($templateVars['traits'] as $trait) {
+                if (!str_contains($classContents, $trait . ';')) {
+                    $namespace->addUse($trait);
+                    $class->addTrait($trait);
+                }
+            }
+
+            $printer = new PsrPrinter();
+            foreach ($file->getNamespaces() as $namespace) {
+                $namespace->setBracketedSyntax(false);
+            }
+            $classContents = $printer->printFile($file);
+
+            // Add extend extension if not present
+            if (!empty($templateVars['requires_extend_extension']) && !$class->hasMethod('setExtendExtension')) {
+                $extendExtension = $fileManager->parseTemplate(
+                    __DIR__ . '/../Resources/skeleton/doctrine/include/installer_extend_extension.tpl.php',
+                    $templateVars
+                );
+                $versionStr = '    public function getMigrationVersion()';
+                $classContents = str_replace($versionStr, $extendExtension . PHP_EOL . $versionStr, $classContents);
+            }
+
+            // Add generated methods to before the closing }
+            $classContents = trim($classContents);
+            $methods = $fileManager->parseTemplate(
+                __DIR__ . '/../Resources/skeleton/doctrine/include/installer_functions.tpl.php',
+                $templateVars
+            );
+            $classContents = substr($classContents, 0, -1) . $methods . '}' . PHP_EOL;
+
+            $generator->dumpFile($installerPath, $classContents);
+        } else {
+            array_unshift($templateVars['interfaces'], 'Oro\Bundle\MigrationBundle\Migration\Installation');
+            $generator->generateClass(
+                $installerClassNameDetails->getFullName(),
+                __DIR__ . '/../Resources/skeleton/doctrine/installer.tpl.php',
+                $templateVars,
+            );
+        }
     }
 
     public function generateDataMigrations(Generator $generator, array $configData): void

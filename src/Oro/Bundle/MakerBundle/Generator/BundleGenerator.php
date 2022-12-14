@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MakerBundle\Generator;
 
 use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
+use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
 
@@ -21,16 +22,22 @@ class BundleGenerator implements GeneratorInterface
         $bundlePrefix = Str::asCamelCase($configData['options']['organization'])
             . Str::asCamelCase($configData['options']['package']);
         $bundleClassNameDetails = $generator->createClassNameDetails($bundlePrefix, '', 'Bundle');
-        $generator->generateClass(
-            $bundleClassNameDetails->getFullName(),
-            __DIR__ . '/../Resources/skeleton/bundle/bundle.tpl.php'
-        );
 
-        $generator->generateFile(
-            $srcPath . '/Resources/config/oro/bundles.yml',
-            __DIR__ . '/../Resources/skeleton/bundle/bundles.yml.tpl.php',
-            ['bundle_class_name' => $bundleClassNameDetails->getFullName()]
-        );
+        try {
+            $generator->generateClass(
+                $bundleClassNameDetails->getFullName(),
+                __DIR__ . '/../Resources/skeleton/bundle/bundle.tpl.php'
+            );
+
+            $generator->generateFile(
+                $srcPath . '/Resources/config/oro/bundles.yml',
+                __DIR__ . '/../Resources/skeleton/bundle/bundles.yml.tpl.php',
+                ['bundle_class_name' => $bundleClassNameDetails->getFullName()]
+            );
+        } catch (RuntimeCommandException $e) {
+            // Skip existing file exception to unlock partial generation
+        }
+
         MetadataStorage::setGlobalMetadata('bundle_class_name', $bundleClassNameDetails->getFullName());
 
         return true;

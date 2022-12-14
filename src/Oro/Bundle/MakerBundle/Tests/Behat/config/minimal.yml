@@ -1,0 +1,9 @@
+generate:
+    options:
+        organization: acme
+        package: example
+    entities:
+        entity_minimal:
+            fields:
+                title:
+                    type: string

@@ -417,6 +417,14 @@ class EntityInstallerHelper
         $tableName = MetadataStorage::getClassMetadata($fieldConfig['relation_target'], 'table_name');
         $idInfo = MetadataStorage::getClassMetadata($fieldConfig['relation_target'], 'id_info');
 
+        if (!$idInfo) {
+            throw new \RuntimeException(sprintf(
+                'Unable to get ID field metadata for entity %s.' .
+                ' Please check that installation with this entity was performed and caches are warmed up.',
+                $fieldConfig['relation_target']
+            ));
+        }
+
         return [
             'table_name' => $tableName,
             'pk_field_name' => $idInfo['field_name'],

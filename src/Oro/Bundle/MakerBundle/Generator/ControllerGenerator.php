@@ -9,7 +9,6 @@ use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Generates controller classes for entities with enabled CRUD
@@ -124,7 +123,7 @@ class ControllerGenerator implements GeneratorInterface
         }
         $this->registerRouting($configData, $generator, $srcPath);
 
-        $generator->generateFile(
+        $generator->generateOrModifyYamlFile(
             LocationMapper::getServicesConfigPath($srcPath, 'controllers.yml'),
             __DIR__ . '/../Resources/skeleton/crud/controllers.yml.tpl.php',
             [
@@ -136,40 +135,26 @@ class ControllerGenerator implements GeneratorInterface
 
     private function registerRouting(array $configData, Generator $generator, string $srcPath): void
     {
-        $routingFile = LocationMapper::getOroConfigPath($srcPath, 'routing.yml');
         if (MetadataStorage::getGlobalMetadata('bundle_less')) {
-            $routingContent = '';
-            if (is_file($routingFile)) {
-                $routingContent = file_get_contents($routingFile) . PHP_EOL;
-            }
-            $routeData = Yaml::parse($routingContent);
-
-            if (!array_key_exists('app', $routeData)) {
-                $appSection = <<<APP
-app:
-    resource: ../src/Controller
-    type: annotation
-    prefix: /%web_backend_prefix%/app
-
-APP;
-                $routingContent .= $appSection;
-                file_put_contents($routingFile, $routingContent);
-            }
+            $routingResource = '../src/Controller';
+            $routePrefix = 'app';
+            $prefix = '%web_backend_prefix%/app';
         } else {
             $bundleClass = MetadataStorage::getGlobalMetadata('bundle_class_name');
             $routingResource = '@' . Str::getShortClassName($bundleClass) . '/Controller';
             $routePrefix = CrudHelper::getBundlePrefix($configData);
             $prefix = $configData['options']['package'];
-
-            $generator->generateFile(
-                LocationMapper::getOroConfigPath($srcPath, 'routing.yml'),
-                __DIR__ . '/../Resources/skeleton/crud/routing.yml.tpl.php',
-                [
-                    'resource' => $routingResource,
-                    'route_prefix' => $routePrefix,
-                    'prefix' => $prefix
-                ]
-            );
         }
+
+        $generator->generateOrModifyYamlFile(
+            LocationMapper::getOroConfigPath($srcPath, 'routing.yml'),
+            __DIR__ . '/../Resources/skeleton/crud/routing.yml.tpl.php',
+            [
+                'resource' => $routingResource,
+                'route_prefix' => $routePrefix,
+                'prefix' => $prefix
+            ],
+            true
+        );
     }
 }

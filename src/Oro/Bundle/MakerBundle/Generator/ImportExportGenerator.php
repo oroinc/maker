@@ -103,26 +103,31 @@ class ImportExportGenerator implements GeneratorInterface
         }
 
         if ($exportJobs) {
-            $generator->generateFile(
+            $generator->generateOrModifyYamlFile(
                 LocationMapper::getConfigPath($srcPath, 'batch_jobs.yml'),
                 __DIR__ . '/../Resources/skeleton/import_export/batch_jobs.yml.tpl.php',
                 [
                     'data' => $exportJobs,
                     'prefix' => $prefix
-                ]
+                ],
+                true
             );
         }
 
-        $generator->generateFile(
-            LocationMapper::getServicesConfigPath($srcPath, 'import_export.yml'),
-            __DIR__ . '/../Resources/skeleton/import_export/import_export.yml.tpl.php',
-            [
-                'data' => $importExports,
-                'prefix' => $prefix
-            ]
-        );
-        MetadataStorage::appendGlobalMetadata('service_config_files', 'import_export.yml');
+        if ($importExports) {
+            $generator->generateOrModifyYamlFile(
+                LocationMapper::getServicesConfigPath($srcPath, 'import_export.yml'),
+                __DIR__ . '/../Resources/skeleton/import_export/import_export.yml.tpl.php',
+                [
+                    'data' => $importExports,
+                    'prefix' => $prefix
+                ]
+            );
+            MetadataStorage::appendGlobalMetadata('service_config_files', 'import_export.yml');
 
-        return true;
+            return true;
+        }
+
+        return false;
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MakerBundle\Generator;
 
 use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
+use Oro\Bundle\MakerBundle\Util\FileManager;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Yaml\Yaml;
@@ -33,13 +34,36 @@ class DiExtensionGenerator implements GeneratorInterface
             'DependencyInjection',
             'Extension'
         );
-        $generator->generateClass(
-            $extensionClassNameDetails->getFullName(),
-            __DIR__ . '/../Resources/skeleton/bundle/extension.tpl.php',
-            [
-                'config_files' => MetadataStorage::getGlobalMetadata('service_config_files')
-            ]
-        );
+
+        /** @var FileManager $fileManager */
+        $fileManager = $generator->getFileManager();
+        $extensionPath = $fileManager->getRelativePathForFutureClass($extensionClassNameDetails->getFullName());
+        $configFiles = MetadataStorage::getGlobalMetadata('service_config_files');
+        if ($fileManager->fileExists($extensionPath)) {
+            $classContents = $fileManager->getFileContents($extensionPath);
+            preg_match_all("/->load\(['\"]([a-zA-Z0-9_]+\.yml)['\"]\)/", $classContents, $matches);
+            $existingConfigFiles = $matches[1] ?? [];
+            $toAdd = array_diff($configFiles, $existingConfigFiles);
+            if ($toAdd) {
+                $calls = $fileManager->parseTemplate(
+                    __DIR__ . '/../Resources/skeleton/bundle/include/extension_load_files.tpl.php',
+                    [
+                        'config_files' => $toAdd
+                    ]
+                );
+                $search = "'/../Resources/config'));" . PHP_EOL;
+                $classContents = str_replace($search, $search . $calls, $classContents);
+                $generator->dumpFile($extensionPath, $classContents);
+            }
+        } else {
+            $generator->generateClass(
+                $extensionClassNameDetails->getFullName(),
+                __DIR__ . '/../Resources/skeleton/bundle/extension.tpl.php',
+                [
+                    'config_files' => $configFiles
+                ]
+            );
+        }
     }
 
     /**

@@ -1,9 +1,4 @@
-<?= "<?php\n"; ?>
-
-namespace <?= $namespace; ?>;
-
-<?php sort($uses); ?>
-<?= implode('' . PHP_EOL, array_map(fn ($use) => 'use ' . $use . ';', $uses)) . PHP_EOL ?>
+<?php include __DIR__ . '/../include/php_file_start.tpl.php'; ?>
 
 /**
  * Import-Export configuration provider for <?= $short_class_name ?>.
