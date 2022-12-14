@@ -25,6 +25,9 @@ class IdInfoMetadataLoader implements ClassMetadataLoaderInterface
 
         /** @var ClassMetadataInfo $metadata */
         $metadata = $this->doctrineHelper->getMetadata($entityClass);
+        if (!$metadata) {
+            return null;
+        }
         $idFieldName = $metadata->getIdentifierFieldNames()[0];
         $idFieldType = $metadata->getTypeOfField($idFieldName);
 

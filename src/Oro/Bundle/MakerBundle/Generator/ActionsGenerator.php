@@ -5,7 +5,6 @@ namespace Oro\Bundle\MakerBundle\Generator;
 use Oro\Bundle\MakerBundle\Helper\ActionsHelper;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
 use Symfony\Bundle\MakerBundle\Generator;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Generates actions.yml
@@ -16,9 +15,10 @@ class ActionsGenerator implements GeneratorInterface
     {
         $actions = ActionsHelper::getActions($configData, $generator, $srcPath);
         if ($actions) {
-            $generator->dumpFile(
+            $generator->addOrModifyYamlFile(
                 LocationMapper::getOroConfigPath($srcPath, 'actions.yml'),
-                Yaml::dump(['operations' => $actions], 8, 4, Yaml::DUMP_NULL_AS_TILDE)
+                ['operations' => $actions],
+                8
             );
 
             return true;

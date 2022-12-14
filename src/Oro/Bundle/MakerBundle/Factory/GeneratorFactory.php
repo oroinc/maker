@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\MakerBundle\Factory;
 
+use Oro\Bundle\MakerBundle\Generator\Generator;
 use Symfony\Bundle\MakerBundle\FileManager;
-use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\PhpCompatUtil;
 use Symfony\Bundle\MakerBundle\Util\TemplateComponentGenerator;

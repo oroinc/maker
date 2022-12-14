@@ -43,7 +43,7 @@ class FormGenerator implements GeneratorInterface
             $formTypes[] = $this->generateEntityFormType($generator, $entityName, $entityConfig);
         }
 
-        $generator->generateFile(
+        $generator->generateOrModifyYamlFile(
             LocationMapper::getServicesConfigPath($srcPath, 'form_types.yml'),
             __DIR__ . '/../Resources/skeleton/form/form_types.yml.tpl.php',
             [

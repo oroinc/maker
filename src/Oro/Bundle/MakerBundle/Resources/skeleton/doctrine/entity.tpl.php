@@ -3,12 +3,7 @@
 use Symfony\Bundle\MakerBundle\Str;
 
 ?>
-<?= "<?php\n" ?>
-
-namespace <?= $namespace ?>;
-
-<?php $uses = array_merge($uses, $traits, $interfaces);sort($uses); ?>
-<?= implode('' . PHP_EOL, array_map(fn ($use) => 'use ' . $use . ';', $uses)) . PHP_EOL ?>
+<?php include __DIR__ . '/../include/php_file_start.tpl.php'; ?>
 
 /**
  * ORM Entity <?= $entity_short_name ?>.

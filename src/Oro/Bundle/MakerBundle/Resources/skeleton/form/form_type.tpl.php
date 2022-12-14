@@ -3,12 +3,7 @@
 use Symfony\Bundle\MakerBundle\Str;
 
 ?>
-<?= "<?php\n" ?>
-
-namespace <?= $namespace ?>;
-
-<?php sort($uses); ?>
-<?= implode('' . PHP_EOL, array_map(fn ($use) => 'use ' . $use . ';', $uses)) . PHP_EOL ?>
+<?php include __DIR__ . '/../include/php_file_start.tpl.php'; ?>
 
 /**
  * Form type for <?= Str::getShortClassName($entity_class_name) ?> entity.

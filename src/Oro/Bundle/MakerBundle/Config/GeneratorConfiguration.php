@@ -40,7 +40,13 @@ class GeneratorConfiguration implements ConfigurationInterface
 
         // Normalize field and entity names to be in snake_case.
         foreach ($processedConfig['entities'] as $entityName => &$entityData) {
-            foreach ($entityData['fields'] as $fieldName => $fieldData) {
+            foreach ($entityData['fields'] as $fieldName => &$fieldData) {
+                // Disable data_audit on field level if it is disabled on entity level
+                if (empty($fieldData['disable_data_audit'])
+                    && empty($entityData['configuration']['auditable'])
+                ) {
+                    $fieldData['disable_data_audit'] = true;
+                }
                 $nameNormalized = strtolower(Str::asSnakeCase($fieldName));
                 if ($nameNormalized === $fieldName) {
                     continue;

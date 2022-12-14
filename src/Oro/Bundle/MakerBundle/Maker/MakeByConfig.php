@@ -146,7 +146,10 @@ class MakeByConfig extends AbstractMaker
     {
         $testClassNameDetails = $generator->createClassNameDetails('Stub', 'Migrations');
         $migrationsPath = $this->getDirectoryForClass($testClassNameDetails->getFullName());
-        $this->fs->rename($migrationsPath, $this->fileManager->absolutizePath('migrations'), true);
+
+        $target = $this->fileManager->absolutizePath('migrations');
+        $this->fs->mirror($migrationsPath, $target, null, ['override' => true, 'delete' => false]);
+        $this->fs->remove($migrationsPath);
     }
 
     private function getDirectoryForClass(string $className): string

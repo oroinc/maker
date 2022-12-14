@@ -9,7 +9,6 @@ use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Generates search.yml.
@@ -42,9 +41,10 @@ class SearchGenerator implements GeneratorInterface
 
         $config = SearchHelper::getSearchConfig($configData);
         if ($config) {
-            $generator->dumpFile(
+            $generator->addOrModifyYamlFile(
                 LocationMapper::getOroConfigPath($srcPath, 'search.yml'),
-                Yaml::dump($config, 8, 4, Yaml::DUMP_NULL_AS_TILDE)
+                $config,
+                8
             );
 
             return true;

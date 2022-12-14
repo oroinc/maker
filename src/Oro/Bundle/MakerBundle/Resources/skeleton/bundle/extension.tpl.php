@@ -12,8 +12,6 @@ class <?= $class_name; ?> extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-<?php foreach ($config_files as $config_file) : ?>
-        $loader->load('<?= $config_file; ?>');<?= PHP_EOL; ?>
-<?php endforeach; ?>
+<?php include 'include/extension_load_files.tpl.php'; ?>
     }
 }

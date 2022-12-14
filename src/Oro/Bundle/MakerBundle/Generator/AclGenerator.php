@@ -5,7 +5,6 @@ namespace Oro\Bundle\MakerBundle\Generator;
 use Oro\Bundle\MakerBundle\Helper\AclHelper;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
 use Symfony\Bundle\MakerBundle\Generator;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Generates acls.yml
@@ -16,9 +15,9 @@ class AclGenerator implements GeneratorInterface
     {
         $acls = AclHelper::getAcls($configData);
         if ($acls) {
-            $generator->dumpFile(
+            $generator->addOrModifyYamlFile(
                 LocationMapper::getOroConfigPath($srcPath, 'acls.yml'),
-                Yaml::dump(['acls' => $acls], 4, 4, Yaml::DUMP_NULL_AS_TILDE)
+                ['acls' => $acls]
             );
 
             return true;

@@ -1,9 +1,8 @@
 services:
-    _defaults:
-        public: true
 <?php foreach ($controllers as $controller): ?>
 
     <?= $controller ?>:
+        public: true
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
