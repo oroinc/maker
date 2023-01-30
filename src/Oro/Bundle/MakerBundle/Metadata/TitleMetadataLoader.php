@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\MakerBundle\Metadata;
 
-use Symfony\Bundle\MakerBundle\Str;
-
 /**
  * Provide entity_title information based on title candidates and entity fields.
  */

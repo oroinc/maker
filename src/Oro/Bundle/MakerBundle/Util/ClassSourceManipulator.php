@@ -450,7 +450,6 @@ final class ClassSourceManipulator
                     ]
                 ]
             );
-
         } else {
             $annotations[] = $this->annotationRenderer->getLines('ORM\\OneToMany', $annotationOptions);
         }
@@ -608,7 +607,8 @@ final class ClassSourceManipulator
                     new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $propertyName)
                 ),
                 new Node\Expr\Variable($argName)
-            ));
+            )
+        );
 
         // set the owning side of the relationship
         if (!$relation->isOwning()) {
@@ -876,8 +876,10 @@ final class ClassSourceManipulator
                 // just not needed yet
                 throw new \Exception('not supported');
             case self::CONTEXT_CLASS_METHOD:
-                return BuilderHelpers::normalizeStmt(new Node\Expr\Variable(sprintf('__COMMENT__VAR_%d',
-                    \count($this->pendingComments) - 1)));
+                return BuilderHelpers::normalizeStmt(new Node\Expr\Variable(sprintf(
+                    '__COMMENT__VAR_%d',
+                    \count($this->pendingComments) - 1
+                )));
             default:
                 throw new \Exception('Unknown context: ' . $context);
         }

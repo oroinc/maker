@@ -29,7 +29,7 @@ class ActionsHelper
                     __DIR__ . '/../Resources/skeleton/crud/templates/actions/update.html.twig.tpl.php',
                     [
                         'fields' => array_map(
-                            static fn(string $fieldName) => Str::asLowerCamelCase($fieldName),
+                            static fn (string $fieldName) => Str::asLowerCamelCase($fieldName),
                             array_keys($entityConfig['fields'])
                         )
                     ]

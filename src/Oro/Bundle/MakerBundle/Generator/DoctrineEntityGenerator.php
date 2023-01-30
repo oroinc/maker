@@ -18,7 +18,6 @@ use Oro\Bundle\MakerBundle\Util\FileManager;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
-use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 
 /**
  * Generates doctrine entities and repository classes for them.

@@ -13,11 +13,11 @@ class AnnotationRenderer
     public function render(string $annotation, array $options = null): string
     {
         return implode(
-                PHP_EOL,
-                array_map(static function (string $item) {
-                    return ' * ' . $item;
-                }, $this->getLines($annotation, $options))
-            ) . PHP_EOL;
+            PHP_EOL,
+            array_map(static function (string $item) {
+                return ' * ' . $item;
+            }, $this->getLines($annotation, $options))
+        ) . PHP_EOL;
     }
 
     public function getLines(string $annotation, array $options = null, bool $singleLine = false): array
