@@ -28,7 +28,7 @@ generate:
                     disable_import_export: true
                 image_field:
                     type: image
-                enum_field:
+                enumField:
                     type: enum
                     values:
                         - 1
@@ -50,10 +50,10 @@ generate:
                     type: html
                 wysiwyg_field:
                     type: wysiwyg
-                many_to_one_internal_relation:
-                    type: '@entity_two'
+                manyToOneInternalRelation:
+                    type: '@entityTwo'
                 many_to_many_internal_relation:
-                    type: '@entity_two[]'
+                    type: '@entityTwo[]'
                     relation_type: many-to-many
                 one_to_many_external_relation:
                     type: relation
@@ -67,7 +67,7 @@ generate:
                     type: '@entity_without_crud[]'
                 many_to_one_external_relation:
                     type: '@Oro\Bundle\UserBundle\Entity\User'
-        entity_two:
+        entityTwo:
             configuration:
                 owner: user
             fields:
