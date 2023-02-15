@@ -389,6 +389,7 @@ class DoctrineEntityGenerator implements GeneratorInterface
                 }
                 $fieldConfig['relation_target'] = $target;
             } else {
+                $target = Str::asSnakeCase($target);
                 if (MetadataStorage::getClassNameByAlias($target) === null) {
                     throw new \InvalidArgumentException('Unknown entity reference provided');
                 }
