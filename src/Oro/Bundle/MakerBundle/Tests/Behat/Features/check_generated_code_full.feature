@@ -210,7 +210,7 @@ Feature: Check generated code full
     And number of records should be 2
     And I should see following search results:
       | Title                                                    | Type       |
-      | furniture String                                         | Entity One |
+      | String furniture                                         | Entity One |
       | NamePrefix3 FirstName3 MiddleName3 LastName3 NameSuffix3 | Entity Two |
 
   Scenario: Search by Entity One
@@ -228,8 +228,8 @@ Feature: Check generated code full
     And number of records should be 1
     And I should see following search results:
       | Title            | Type       |
-      | furniture String | Entity One |
-    When I click "furniture String"
+      | String furniture | Entity One |
+    When I click "String furniture"
     Then I should see entity_one with:
       | Integer Field                 | 10                                                       |
       | Float Field                   | 10.1                                                     |

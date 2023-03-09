@@ -79,24 +79,22 @@ class DoctrineEntityGenerator implements GeneratorInterface
                 ['field_name' => 'id', 'field_type' => 'integer']
             );
 
-            $entityExtendClassDetails = $generator->createClassNameDetails(
-                'extend_' . $entityName,
-                'Model\\',
-            );
             $repoClassDetails = $generator->createClassNameDetails(
                 $entityClassDetails->getRelativeName(),
                 'Entity\\Repository\\',
                 'Repository'
             );
 
-            $extendEntityFQCN = $entityExtendClassDetails->getFullName();
-            $traits = [];
-            $interfaces = [];
+            $traits = [
+                'Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait'
+            ];
+            $interfaces = [
+                'Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface'
+            ];
             $uses = [
                 'Doctrine\ORM\Mapping as ORM',
                 'Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config',
-                'Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField',
-                $extendEntityFQCN
+                'Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField'
             ];
             EntityDependencyHelper::configureTraitsAndInterfaces($entityName, $entityConfig, $traits, $interfaces);
 
@@ -105,7 +103,6 @@ class DoctrineEntityGenerator implements GeneratorInterface
                 __DIR__ . '/../Resources/skeleton/doctrine/entity.tpl.php',
                 [
                     'entity_short_name' => $entityClassDetails->getShortName(),
-                    'extend_entity_class_name' => Str::getShortClassName($extendEntityFQCN),
                     'uses' => $uses,
                     'traits' => $traits,
                     'interfaces' => $interfaces,
@@ -126,14 +123,6 @@ class DoctrineEntityGenerator implements GeneratorInterface
                 ]
             );
             MetadataStorage::addClassMetadata($entityFQCN, 'entity_class_path', $entityPath);
-
-            $generator->generateClass(
-                $entityExtendClassDetails->getFullName(),
-                __DIR__ . '/../Resources/skeleton/doctrine/entity_extend.tpl.php',
-                [
-                    'entity_short_name' => $entityClassDetails->getShortName()
-                ]
-            );
 
             $shortEntityClass = Str::getShortClassName($entityFQCN);
             $generator->generateClass(
