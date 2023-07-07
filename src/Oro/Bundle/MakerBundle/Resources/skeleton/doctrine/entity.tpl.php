@@ -9,6 +9,7 @@ use Symfony\Bundle\MakerBundle\Str;
  * ORM Entity <?= $entity_short_name ?>.
  *
 <?= implode('', $entity_annotations) ?>
+ * @mixin <?= $autocomplete_class_name . PHP_EOL ?>
  */
 class <?= $class_name ?><?php if ($interfaces): ?> implements
 <?= implode(',' . PHP_EOL, array_map(static fn ($interface) => '    ' . Str::getShortClassName($interface), $interfaces)) ?><?php endif ?><?= PHP_EOL ?>

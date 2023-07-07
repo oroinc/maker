@@ -6,6 +6,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MakerBundle\Helper\CrudHelper;
 use Oro\Bundle\MakerBundle\Helper\EntityDependencyHelper;
@@ -91,10 +92,13 @@ class DoctrineEntityGenerator implements GeneratorInterface
             $interfaces = [
                 'Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface'
             ];
+            $autocompleteClass = ExtendClassLoadingUtils::getAutocompleteClassName($entityClassDetails->getFullName());
+            $autocompleteUse = ExtendClassLoadingUtils::getAutocompleteNamespace() . '\\' . $autocompleteClass;
             $uses = [
                 'Doctrine\ORM\Mapping as ORM',
                 'Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config',
-                'Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField'
+                'Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField',
+                $autocompleteUse
             ];
             EntityDependencyHelper::configureTraitsAndInterfaces($entityName, $entityConfig, $traits, $interfaces);
 
@@ -119,7 +123,8 @@ class DoctrineEntityGenerator implements GeneratorInterface
                             'Config',
                             OroEntityConfigHelper::getConfig($entityName, $entityConfig, $generator)
                         )
-                    ]
+                    ],
+                    'autocomplete_class_name' => $autocompleteClass
                 ]
             );
             MetadataStorage::addClassMetadata($entityFQCN, 'entity_class_path', $entityPath);
