@@ -65,7 +65,6 @@ class TranslationHelper
                 if ($fieldConfig['relation_type'] === 'many-to-many') {
                     $singularField = StrHelper::getInflector()->singularize($fieldName);
 
-
                     if (empty($fieldConfig['is_inverse']) && !empty($fieldConfig['is_owning_side'])) {
                         $targetEntity = $entityAlias;
                         $targetField = $singularField;
