@@ -331,7 +331,6 @@ final class ClassSourceManipulator
             $annotationOptions
         );
 
-
         if ($relation->isOwning()) {
             $annotations[] = $this->annotationRenderer->getLines(
                 'ORM\\JoinColumn',
