@@ -66,7 +66,7 @@ class GeneratorConfiguration implements ConfigurationInterface
         return $processedConfig;
     }
 
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('generate');
         $rootNode = $treeBuilder->getRootNode();
