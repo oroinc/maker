@@ -32,7 +32,7 @@ class <?= $class_name; ?> extends AbstractController
         <?= $detach_action['target_entity_class'] ?> $entity
     ): JsonResponse {
         $holder->remove<?= $detach_action['remove_method'] ?>($entity);
-        $this->get('doctrine')->getManagerForClass(<?= $short_class_name ?>::class)->flush();
+        $this->container->get('doctrine')->getManagerForClass(<?= $short_class_name ?>::class)->flush();
 
         return new JsonResponse();
     }
