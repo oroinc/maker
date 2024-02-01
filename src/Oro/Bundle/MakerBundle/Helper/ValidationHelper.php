@@ -66,11 +66,14 @@ class ValidationHelper
         if (isset($fieldConfig['max_length'])) {
             $constraintOptions['max'] = $fieldConfig['max_length'];
         }
-        $constraints = ['Length' => $constraintOptions];
-        if (empty($fieldConfig['required'])) {
-            $constraints['Blank'] = null;
+
+        if (empty($fieldConfig['required']) && !empty($constraintOptions['min'])) {
+            $constraints = ['AtLeastOneOf' => [
+                ['Length' => $constraintOptions],
+                ['Blank' => null]
+            ]];
         } else {
-            $constraints['NotBlank'] = null;
+            $constraints = ['Length' => $constraintOptions];
         }
 
         $validation[$className]['properties'][$fieldName][] = $constraints;

@@ -29,6 +29,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Parser;
+use PhpParser\PhpVersion;
 use Symfony\Bundle\MakerBundle\Doctrine\BaseCollectionRelation;
 use Symfony\Bundle\MakerBundle\Doctrine\BaseRelation;
 use Symfony\Bundle\MakerBundle\Doctrine\RelationManyToMany;
@@ -74,16 +75,23 @@ final class ClassSourceManipulator
         $this->annotationRenderer = $annotationRenderer;
         $this->overwrite = $overwrite;
         $this->fluentMutators = $fluentMutators;
-        $this->lexer = new Lexer\Emulative([
-            'usedAttributes' => [
-                'comments',
-                'startLine',
-                'endLine',
-                'startTokenPos',
-                'endTokenPos',
-            ],
-        ]);
-        $this->parser = new Parser\Php7($this->lexer);
+        /* @legacy Support for nikic/php-parser v4 */
+        if (class_exists(PhpVersion::class)) {
+            $version = PhpVersion::fromString(\PHP_VERSION);
+            $this->lexer = new Lexer\Emulative($version);
+            $this->parser = new Parser\Php8($this->lexer, $version);
+        } else {
+            $this->lexer = new Lexer\Emulative([
+                'usedAttributes' => [
+                    'comments',
+                    'startLine',
+                    'endLine',
+                    'startTokenPos',
+                    'endTokenPos',
+                ],
+            ]);
+            $this->parser = new Parser\Php7($this->lexer);
+        }
         $this->printer = new PrettyPrinter();
 
         $this->setSourceCode($sourceCode);
@@ -202,15 +210,17 @@ final class ClassSourceManipulator
         $this->addCustomGetter($propertyName, $methodName, $returnType, $isReturnTypeNullable, $commentLines);
     }
 
-    public function addSetter(string $propertyName, $type, bool $isNullable, array $commentLines = []): void
+    public function addSetter(string $propertyName, ?string $type, bool $isNullable, array $commentLines = []): void
     {
         $propertyName = Str::asLowerCamelCase($propertyName);
         $builder = $this->createSetterNodeBuilder($propertyName, $type, $isNullable, $commentLines);
         $builder->addStmt(
-            new Node\Stmt\Expression(new Node\Expr\Assign(
-                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $propertyName),
-                new Node\Expr\Variable($propertyName)
-            ))
+            new Node\Stmt\Expression(
+                new Node\Expr\Assign(
+                    new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $propertyName),
+                    new Node\Expr\Variable($propertyName)
+                )
+            )
         );
         $this->makeMethodFluent($builder);
         $this->addMethod($builder->getNode());
@@ -270,7 +280,11 @@ final class ClassSourceManipulator
             );
 
         if (null !== $returnType) {
-            $getterNodeBuilder->setReturnType($isReturnTypeNullable ? new Node\NullableType($returnType) : $returnType);
+            $getterNodeBuilder->setReturnType(
+                $isReturnTypeNullable
+                    ? new Node\NullableType(new Node\Identifier($returnType))
+                    : $returnType
+            );
         }
 
         if ($commentLines) {
@@ -295,7 +309,7 @@ final class ClassSourceManipulator
 
         $paramBuilder = new Builder\Param($propertyName);
         if (null !== $type) {
-            $paramBuilder->setTypeHint($isNullable ? new Node\NullableType($type) : $type);
+            $paramBuilder->setType($isNullable ? new Node\NullableType(new Node\Identifier($type)) : $type);
         }
         $setterNodeBuilder->addParam($paramBuilder->getNode());
 
@@ -384,10 +398,12 @@ final class ClassSourceManipulator
         }
 
         $setterNodeBuilder->addStmt(
-            new Node\Stmt\Expression(new Node\Expr\Assign(
-                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $propertyName),
-                new Node\Expr\Variable($propertyName)
-            ))
+            new Node\Stmt\Expression(
+                new Node\Expr\Assign(
+                    new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $propertyName),
+                    new Node\Expr\Variable($propertyName)
+                )
+            )
         );
         $this->makeMethodFluent($setterNodeBuilder);
         $this->addMethod($setterNodeBuilder->getNode());
@@ -430,22 +446,32 @@ final class ClassSourceManipulator
                 [
                     'name' => $config['join_table'],
                     'joinColumns' => [
-                        implode('', $this->annotationRenderer->getLines(
-                            'ORM\JoinColumn',
-                            ['name' => $config['join_column'], 'referencedColumnName' => 'id', 'onDelete' => 'CASCADE'],
-                            true
-                        ))
+                        implode(
+                            '',
+                            $this->annotationRenderer->getLines(
+                                'ORM\JoinColumn',
+                                [
+                                    'name' => $config['join_column'],
+                                    'referencedColumnName' => 'id',
+                                    'onDelete' => 'CASCADE'
+                                ],
+                                true
+                            )
+                        )
                     ],
                     'inverseJoinColumns' => [
-                        implode('', $this->annotationRenderer->getLines(
-                            'ORM\JoinColumn',
-                            [
-                                'name' => $config['inverse_join_column'],
-                                'referencedColumnName' => 'id',
-                                'onDelete' => 'CASCADE'
-                            ],
-                            true
-                        ))
+                        implode(
+                            '',
+                            $this->annotationRenderer->getLines(
+                                'ORM\JoinColumn',
+                                [
+                                    'name' => $config['inverse_join_column'],
+                                    'referencedColumnName' => 'id',
+                                    'onDelete' => 'CASCADE'
+                                ],
+                                true
+                            )
+                        )
                     ]
                 ]
             );
@@ -492,10 +518,12 @@ final class ClassSourceManipulator
 
         if ($addArrayCollection) {
             $this->addStatementToConstructor(
-                new Node\Stmt\Expression(new Node\Expr\Assign(
-                    new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $propertyName),
-                    new Node\Expr\New_(new Node\Name($arrayCollectionTypeHint))
-                ))
+                new Node\Stmt\Expression(
+                    new Node\Expr\Assign(
+                        new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $propertyName),
+                        new Node\Expr\New_(new Node\Name($arrayCollectionTypeHint))
+                    )
+                )
             );
         }
     }
@@ -507,7 +535,7 @@ final class ClassSourceManipulator
         $removerNodeBuilder = (new Builder\Method($relation->getRemoverMethodName()))->makePublic();
 
         $paramBuilder = new Builder\Param($argName);
-        $paramBuilder->setTypeHint($typeHint);
+        $paramBuilder->setType($typeHint);
         $removerNodeBuilder->addParam($paramBuilder->getNode());
 
         // $this->avatars->removeElement($avatar)
@@ -540,21 +568,25 @@ final class ClassSourceManipulator
                 );
 
                 // if ($student->getCourse() === $this) {
-                $ifNode = new Node\Stmt\If_(new Node\Expr\BinaryOp\Identical(
-                    new Node\Expr\MethodCall(
-                        new Node\Expr\Variable($argName),
-                        $relation->getTargetGetterMethodName()
-                    ),
-                    new Node\Expr\Variable('this')
-                ));
+                $ifNode = new Node\Stmt\If_(
+                    new Node\Expr\BinaryOp\Identical(
+                        new Node\Expr\MethodCall(
+                            new Node\Expr\Variable($argName),
+                            $relation->getTargetGetterMethodName()
+                        ),
+                        new Node\Expr\Variable('this')
+                    )
+                );
 
                 // $student->setCourse(null);
                 $ifNode->stmts = [
-                    new Node\Stmt\Expression(new Node\Expr\MethodCall(
-                        new Node\Expr\Variable($argName),
-                        $relation->getTargetSetterMethodName(),
-                        [new Node\Arg($this->createNullConstant())]
-                    )),
+                    new Node\Stmt\Expression(
+                        new Node\Expr\MethodCall(
+                            new Node\Expr\Variable($argName),
+                            $relation->getTargetSetterMethodName(),
+                            [new Node\Arg($this->createNullConstant())]
+                        )
+                    ),
                 ];
 
                 $ifRemoveElementStmt->stmts[] = $ifNode;
@@ -585,7 +617,8 @@ final class ClassSourceManipulator
         $adderNodeBuilder = (new Builder\Method($relation->getAdderMethodName()))->makePublic();
 
         $paramBuilder = new Builder\Param($argName);
-        $paramBuilder->setTypeHint($typeHint);
+
+        $paramBuilder->setType($typeHint);
         $adderNodeBuilder->addParam($paramBuilder->getNode());
 
         // if (!$this->avatars->contains($avatar))
@@ -758,7 +791,7 @@ final class ClassSourceManipulator
         foreach ($this->pendingComments as $i => $comment) {
             // sanity check
             $placeholder = sprintf('$__COMMENT__VAR_%d;', $i);
-            if (false === strpos($newCode, $placeholder)) {
+            if (!str_contains($newCode, $placeholder)) {
                 // this can happen if a comment is createSingleLineCommentNode()
                 // is called, but then that generated code is ultimately not added
                 continue;
@@ -775,7 +808,13 @@ final class ClassSourceManipulator
     {
         $this->sourceCode = $sourceCode;
         $this->oldStmts = $this->parser->parse($sourceCode);
-        $this->oldTokens = $this->lexer->getTokens();
+
+        /* @legacy Support for nikic/php-parser v4 */
+        if (\is_callable([$this->parser, 'getTokens'])) {
+            $this->oldTokens = $this->parser->getTokens();
+        } elseif (\is_callable([$this->lexer, 'getTokens'])) {
+            $this->oldTokens = $this->lexer->getTokens();
+        }
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new NodeVisitor\CloningVisitor());
@@ -875,10 +914,14 @@ final class ClassSourceManipulator
                 // just not needed yet
                 throw new \Exception('not supported');
             case self::CONTEXT_CLASS_METHOD:
-                return BuilderHelpers::normalizeStmt(new Node\Expr\Variable(sprintf(
-                    '__COMMENT__VAR_%d',
-                    \count($this->pendingComments) - 1
-                )));
+                return BuilderHelpers::normalizeStmt(
+                    new Node\Expr\Variable(
+                        sprintf(
+                            '__COMMENT__VAR_%d',
+                            \count($this->pendingComments) - 1
+                        )
+                    )
+                );
             default:
                 throw new \Exception('Unknown context: ' . $context);
         }
@@ -1081,25 +1124,31 @@ final class ClassSourceManipulator
         Builder\Method $setterNodeBuilder
     ): void {
         if (!$relation->isNullable()) {
-            $setterNodeBuilder->addStmt($this->createSingleLineCommentNode(
-                'set the owning side of the relation if necessary',
-                self::CONTEXT_CLASS_METHOD
-            ));
+            $setterNodeBuilder->addStmt(
+                $this->createSingleLineCommentNode(
+                    'set the owning side of the relation if necessary',
+                    self::CONTEXT_CLASS_METHOD
+                )
+            );
 
-            $ifNode = new Node\Stmt\If_(new Node\Expr\BinaryOp\NotIdentical(
-                new Node\Expr\MethodCall(
-                    new Node\Expr\Variable($relation->getPropertyName()),
-                    $relation->getTargetGetterMethodName()
-                ),
-                new Node\Expr\Variable('this')
-            ));
+            $ifNode = new Node\Stmt\If_(
+                new Node\Expr\BinaryOp\NotIdentical(
+                    new Node\Expr\MethodCall(
+                        new Node\Expr\Variable($relation->getPropertyName()),
+                        $relation->getTargetGetterMethodName()
+                    ),
+                    new Node\Expr\Variable('this')
+                )
+            );
 
             $ifNode->stmts = [
-                new Node\Stmt\Expression(new Node\Expr\MethodCall(
-                    new Node\Expr\Variable($relation->getPropertyName()),
-                    $relation->getTargetSetterMethodName(),
-                    [new Node\Arg(new Node\Expr\Variable('this'))]
-                )),
+                new Node\Stmt\Expression(
+                    new Node\Expr\MethodCall(
+                        new Node\Expr\Variable($relation->getPropertyName()),
+                        $relation->getTargetSetterMethodName(),
+                        [new Node\Arg(new Node\Expr\Variable('this'))]
+                    )
+                ),
             ];
             $setterNodeBuilder->addStmt($ifNode);
             $setterNodeBuilder->addStmt($this->createBlankLineNode(self::CONTEXT_CLASS_METHOD));
@@ -1108,63 +1157,75 @@ final class ClassSourceManipulator
         }
 
         // at this point, we know the relation is nullable
-        $setterNodeBuilder->addStmt($this->createSingleLineCommentNode(
-            'unset the owning side of the relation if necessary',
-            self::CONTEXT_CLASS_METHOD
-        ));
-
-        $ifNode = new Node\Stmt\If_(new Node\Expr\BinaryOp\BooleanAnd(
-            new Node\Expr\BinaryOp\Identical(
-                new Node\Expr\Variable($relation->getPropertyName()),
-                $this->createNullConstant()
-            ),
-            new Node\Expr\BinaryOp\NotIdentical(
-                new Node\Expr\PropertyFetch(
-                    new Node\Expr\Variable('this'),
-                    $relation->getPropertyName()
-                ),
-                $this->createNullConstant()
+        $setterNodeBuilder->addStmt(
+            $this->createSingleLineCommentNode(
+                'unset the owning side of the relation if necessary',
+                self::CONTEXT_CLASS_METHOD
             )
-        ));
+        );
+
+        $ifNode = new Node\Stmt\If_(
+            new Node\Expr\BinaryOp\BooleanAnd(
+                new Node\Expr\BinaryOp\Identical(
+                    new Node\Expr\Variable($relation->getPropertyName()),
+                    $this->createNullConstant()
+                ),
+                new Node\Expr\BinaryOp\NotIdentical(
+                    new Node\Expr\PropertyFetch(
+                        new Node\Expr\Variable('this'),
+                        $relation->getPropertyName()
+                    ),
+                    $this->createNullConstant()
+                )
+            )
+        );
         $ifNode->stmts = [
             // $this->user->setUserProfile(null)
-            new Node\Stmt\Expression(new Node\Expr\MethodCall(
-                new Node\Expr\PropertyFetch(
-                    new Node\Expr\Variable('this'),
-                    $relation->getPropertyName()
-                ),
-                $relation->getTargetSetterMethodName(),
-                [new Node\Arg($this->createNullConstant())]
-            )),
+            new Node\Stmt\Expression(
+                new Node\Expr\MethodCall(
+                    new Node\Expr\PropertyFetch(
+                        new Node\Expr\Variable('this'),
+                        $relation->getPropertyName()
+                    ),
+                    $relation->getTargetSetterMethodName(),
+                    [new Node\Arg($this->createNullConstant())]
+                )
+            ),
         ];
         $setterNodeBuilder->addStmt($ifNode);
 
         $setterNodeBuilder->addStmt($this->createBlankLineNode(self::CONTEXT_CLASS_METHOD));
-        $setterNodeBuilder->addStmt($this->createSingleLineCommentNode(
-            'set the owning side of the relation if necessary',
-            self::CONTEXT_CLASS_METHOD
-        ));
+        $setterNodeBuilder->addStmt(
+            $this->createSingleLineCommentNode(
+                'set the owning side of the relation if necessary',
+                self::CONTEXT_CLASS_METHOD
+            )
+        );
 
         // if ($user === null && $this->user !== null)
-        $ifNode = new Node\Stmt\If_(new Node\Expr\BinaryOp\BooleanAnd(
-            new Node\Expr\BinaryOp\NotIdentical(
-                new Node\Expr\Variable($relation->getPropertyName()),
-                $this->createNullConstant()
-            ),
-            new Node\Expr\BinaryOp\NotIdentical(
+        $ifNode = new Node\Stmt\If_(
+            new Node\Expr\BinaryOp\BooleanAnd(
+                new Node\Expr\BinaryOp\NotIdentical(
+                    new Node\Expr\Variable($relation->getPropertyName()),
+                    $this->createNullConstant()
+                ),
+                new Node\Expr\BinaryOp\NotIdentical(
+                    new Node\Expr\MethodCall(
+                        new Node\Expr\Variable($relation->getPropertyName()),
+                        $relation->getTargetGetterMethodName()
+                    ),
+                    new Node\Expr\Variable('this')
+                )
+            )
+        );
+        $ifNode->stmts = [
+            new Node\Stmt\Expression(
                 new Node\Expr\MethodCall(
                     new Node\Expr\Variable($relation->getPropertyName()),
-                    $relation->getTargetGetterMethodName()
-                ),
-                new Node\Expr\Variable('this')
-            )
-        ));
-        $ifNode->stmts = [
-            new Node\Stmt\Expression(new Node\Expr\MethodCall(
-                new Node\Expr\Variable($relation->getPropertyName()),
-                $relation->getTargetSetterMethodName(),
-                [new Node\Arg(new Node\Expr\Variable('this'))]
-            )),
+                    $relation->getTargetSetterMethodName(),
+                    [new Node\Arg(new Node\Expr\Variable('this'))]
+                )
+            ),
         ];
         $setterNodeBuilder->addStmt($ifNode);
 
@@ -1179,7 +1240,9 @@ final class ClassSourceManipulator
     private function getMethodIndex(string $methodName)
     {
         foreach ($this->getClassNode()->stmts as $i => $node) {
-            if ($node instanceof Node\Stmt\ClassMethod && strtolower($node->name->toString()) === strtolower($methodName)) {
+            if ($node instanceof Node\Stmt\ClassMethod && strtolower($node->name->toString()) === strtolower(
+                    $methodName
+                )) {
                 return $i;
             }
         }

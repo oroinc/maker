@@ -32,6 +32,7 @@ class ControllerGenerator implements GeneratorInterface
             $entityClass = MetadataStorage::getClassName($entityName);
             $formType = MetadataStorage::getClassMetadata($entityName, 'form_type');
             $uses = [
+                'Doctrine\Persistence\ManagerRegistry',
                 'Oro\Bundle\FormBundle\Model\UpdateHandlerFacade',
                 'Oro\Bundle\SecurityBundle\Annotation\Acl',
                 'Oro\Bundle\SecurityBundle\Annotation\AclAncestor',

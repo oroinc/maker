@@ -14,7 +14,7 @@
   },
   "require": {
     "oro/platform": "6.0.*",
-    "symfony/maker-bundle": "1.39"
+    "symfony/maker-bundle": "^v1.52.0"
   },
   "repositories": {
     "oro": {

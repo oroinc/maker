@@ -32,7 +32,10 @@ class <?= $class_name; ?> extends AbstractController
         <?= $detach_action['target_entity_class'] ?> $entity
     ): JsonResponse {
         $holder->remove<?= $detach_action['remove_method'] ?>($entity);
-        $this->container->get('doctrine')->getManagerForClass(<?= $short_class_name ?>::class)->flush();
+        $this->container
+            ->get(ManagerRegistry::class)
+            ->getManagerForClass(<?= $short_class_name ?>::class)
+            ->flush();
 
         return new JsonResponse();
     }
@@ -82,7 +85,7 @@ class <?= $class_name; ?> extends AbstractController
      */
     public function createAction(Request $request): array|RedirectResponse
     {
-        $createMessage = $this->get(TranslatorInterface::class)->trans(
+        $createMessage = $this->container->get(TranslatorInterface::class)->trans(
             '<?= $saved_message ?>'
         );
 
@@ -103,7 +106,7 @@ class <?= $class_name; ?> extends AbstractController
      */
     public function updateAction(<?= $short_class_name ?> $entity, Request $request): array|RedirectResponse
     {
-        $updateMessage = $this->get(TranslatorInterface::class)->trans(
+        $updateMessage = $this->container->get(TranslatorInterface::class)->trans(
             '<?= $saved_message ?>'
         );
 
@@ -115,7 +118,7 @@ class <?= $class_name; ?> extends AbstractController
         Request $request,
         string $message = ''
     ): array|RedirectResponse {
-        return $this->get(UpdateHandlerFacade::class)->update(
+        return $this->container->get(UpdateHandlerFacade::class)->update(
             $entity,
             $this->createForm(<?= $form_type ?>::class, $entity),
             $message,
@@ -131,6 +134,7 @@ class <?= $class_name; ?> extends AbstractController
             [
                 TranslatorInterface::class,
                 UpdateHandlerFacade::class,
+                ManagerRegistry::class
             ]
         );
     }
