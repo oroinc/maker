@@ -34,8 +34,8 @@ class ControllerGenerator implements GeneratorInterface
             $uses = [
                 'Doctrine\Persistence\ManagerRegistry',
                 'Oro\Bundle\FormBundle\Model\UpdateHandlerFacade',
-                'Oro\Bundle\SecurityBundle\Annotation\Acl',
-                'Oro\Bundle\SecurityBundle\Annotation\AclAncestor',
+                'Oro\Bundle\SecurityBundle\Attribute\Acl',
+                'Oro\Bundle\SecurityBundle\Attribute\AclAncestor',
                 'Sensio\Bundle\FrameworkExtraBundle\Configuration\Template',
                 'Symfony\Bundle\FrameworkBundle\Controller\AbstractController',
                 'Symfony\Component\HttpFoundation\RedirectResponse',

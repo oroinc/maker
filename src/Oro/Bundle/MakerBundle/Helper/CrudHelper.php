@@ -323,7 +323,7 @@ class CrudHelper
         }
 
         if ($detachActions) {
-            $uses[] = 'Oro\Bundle\SecurityBundle\Annotation\CsrfProtection';
+            $uses[] = 'Oro\Bundle\SecurityBundle\Attribute\CsrfProtection';
             $uses[] = 'Symfony\Component\HttpFoundation\JsonResponse';
             $uses[] = 'Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter';
         }

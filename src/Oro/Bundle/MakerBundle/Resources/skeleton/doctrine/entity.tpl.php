@@ -8,18 +8,16 @@ use Symfony\Bundle\MakerBundle\Str;
 /**
  * ORM Entity <?= $entity_short_name ?>.
  *
-<?= implode('', $entity_annotations) ?>
  * @mixin <?= $autocomplete_class_name . PHP_EOL ?>
  */
+<?= implode('', $entity_attributes) ?>
 class <?= $class_name ?><?php if ($interfaces): ?> implements
 <?= implode(',' . PHP_EOL, array_map(static fn ($interface) => '    ' . Str::getShortClassName($interface), $interfaces)) ?><?php endif ?><?= PHP_EOL ?>
 {
 <?php if ($traits): ?><?= implode(PHP_EOL, array_map(static fn ($trait) => '    use ' . Str::getShortClassName($trait) . ';', $traits)) . PHP_EOL . PHP_EOL ?><?php endif ?>
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     public function getId(): ?int

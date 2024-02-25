@@ -14,7 +14,7 @@ use Oro\Bundle\MakerBundle\Helper\EntityInstallerHelper;
 use Oro\Bundle\MakerBundle\Helper\OroEntityConfigHelper;
 use Oro\Bundle\MakerBundle\Helper\OroEntityHelper;
 use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
-use Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer;
+use Oro\Bundle\MakerBundle\Renderer\AttributeRenderer;
 use Oro\Bundle\MakerBundle\Util\FileManager;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -26,16 +26,16 @@ use Symfony\Bundle\MakerBundle\Str;
  */
 class DoctrineEntityGenerator implements GeneratorInterface
 {
-    private AnnotationRenderer $annotationRenderer;
+    private AttributeRenderer $attributeRenderer;
     private EntityInstallerHelper $installerHelper;
     private OroEntityHelper $entityHelper;
 
     public function __construct(
-        AnnotationRenderer $annotationRenderer,
+        AttributeRenderer $attributeRenderer,
         EntityInstallerHelper $installerHelper,
         OroEntityHelper $entityHelper
     ) {
-        $this->annotationRenderer = $annotationRenderer;
+        $this->attributeRenderer = $attributeRenderer;
         $this->installerHelper = $installerHelper;
         $this->entityHelper = $entityHelper;
     }
@@ -96,8 +96,8 @@ class DoctrineEntityGenerator implements GeneratorInterface
             $autocompleteUse = ExtendClassLoadingUtils::getAutocompleteNamespace() . '\\' . $autocompleteClass;
             $uses = [
                 'Doctrine\ORM\Mapping as ORM',
-                'Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config',
-                'Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField',
+                'Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config',
+                'Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField',
                 $autocompleteUse
             ];
             EntityDependencyHelper::configureTraitsAndInterfaces($entityName, $entityConfig, $traits, $interfaces);
@@ -110,16 +110,16 @@ class DoctrineEntityGenerator implements GeneratorInterface
                     'uses' => $uses,
                     'traits' => $traits,
                     'interfaces' => $interfaces,
-                    'entity_annotations' => [
-                        $this->annotationRenderer->render(
+                    'entity_attributes' => [
+                        $this->attributeRenderer->render(
                             'ORM\\Entity',
                             ['repositoryClass' => $repoClassDetails->getFullName()]
                         ),
-                        $this->annotationRenderer->render(
+                        $this->attributeRenderer->render(
                             'ORM\\Table',
                             ['name' => $entityNamePrefixedWithBundle]
                         ),
-                        $this->annotationRenderer->render(
+                        $this->attributeRenderer->render(
                             'Config',
                             OroEntityConfigHelper::getConfig($entityName, $entityConfig, $generator)
                         )

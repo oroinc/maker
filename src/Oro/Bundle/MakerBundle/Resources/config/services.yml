@@ -11,10 +11,9 @@ services:
 
     Oro\Bundle\MakerBundle\Helper\OroEntityHelper:
         arguments:
-            - '@Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer'
             - '@maker.file_manager'
 
-    Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer: ~
+    Oro\Bundle\MakerBundle\Renderer\AttributeRenderer: ~
 
     Oro\Bundle\MakerBundle\Factory\FileManagerFactory:
         arguments:

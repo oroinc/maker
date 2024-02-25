@@ -3,32 +3,41 @@
 namespace Oro\Bundle\MakerBundle\Renderer;
 
 /**
- * Render nested formatted annotations.
+ * Render nested formatted attributes
  * @SuppressWarnings(PHPMD)
  */
-class AnnotationRenderer
+class AttributeRenderer
 {
-    private const BLOCK_SYMBOL = '    ';
+    private const string BLOCK_SYMBOL = '    ';
+    private const string DEFAULT_VALUES_KEY = 'defaultValues';
 
-    public function render(string $annotation, array $options = null): string
+    public function render(string $attribute, array $options = null): string
     {
         return implode(
             PHP_EOL,
             array_map(static function (string $item) {
-                return ' * ' . $item;
-            }, $this->getLines($annotation, $options))
+                return '' . $item;
+            }, $this->getLines($attribute, $options))
         ) . PHP_EOL;
     }
 
-    public function getLines(string $annotation, array $options = null, bool $singleLine = false): array
+    public function getLines(string $attribute, array $options = null, bool $singleLine = false): array
     {
         $rows = [
-            '@' . $annotation . '('
+            '#[' . $attribute . '('
         ];
-        $rows = array_merge($rows, $this->renderValue(1, $options, $singleLine));
-        $rows[] = ')';
 
-        return $rows;
+        if (1 === count($options) && !array_key_exists(self::DEFAULT_VALUES_KEY, $options)) {
+            $rows = array_merge($rows, $this->renderValue(1, $options, true));
+            $rows[] = ')]';
+
+            return [implode($rows)];
+        } else {
+            $rows = array_merge($rows, $this->renderValue(1, $options, $singleLine));
+            $rows[] = ')]';
+
+            return $rows;
+        }
     }
 
     protected function renderValue(int $nestingLevel, array $options = null, bool $singleLine = false): array
@@ -40,27 +49,29 @@ class AnnotationRenderer
             if (is_array($value)) {
                 if (is_int($option)) {
                     $rows[] = sprintf(
-                        '%s{',
+                        '%s[',
                         !$singleLine ? str_repeat(self::BLOCK_SYMBOL, $nestingLevel) : ''
                     );
                 } else {
-                    $rows[] = sprintf(
-                        '%s%s={',
+                    $row = sprintf(
+                        '%s%s%s [',
                         !$singleLine ? str_repeat(self::BLOCK_SYMBOL, $nestingLevel) : '',
-                        $nestingLevel > 1 ? '"' . $option . '"' : $option
+                        $nestingLevel > 1 ? '"' . $option . '"' : $option,
+                        $nestingLevel > 1 ? ' =>' : ':'
                     );
+                    $rows[] = $row;
                 }
                 $rows = array_merge($rows, $this->renderValue($nestingLevel + 1, $value, $singleLine));
-                $str = (!$singleLine ? str_repeat(self::BLOCK_SYMBOL, $nestingLevel) : '') . '}';
+                $str = (!$singleLine ? str_repeat(self::BLOCK_SYMBOL, $nestingLevel) : '') . ']';
             } else {
-                $isSubAnnotation = str_starts_with($value, '@');
-                if (is_string($value) && !$isSubAnnotation) {
+                $isSubAttribute = str_starts_with($value, '#[');
+                if (is_string($value) && !$isSubAttribute) {
                     $value = '"' . $value . '"';
                 } elseif (is_bool($value)) {
                     $value = $value ? 'true' : 'false';
                 }
 
-                if ($isSubAnnotation) {
+                if ($isSubAttribute) {
                     $str = sprintf(
                         '%s%s',
                         !$singleLine ? str_repeat(self::BLOCK_SYMBOL, $nestingLevel) : '',
@@ -68,9 +79,10 @@ class AnnotationRenderer
                     );
                 } else {
                     $str = sprintf(
-                        '%s%s=%s',
+                        '%s%s%s %s',
                         !$singleLine ? str_repeat(self::BLOCK_SYMBOL, $nestingLevel) : '',
                         $nestingLevel > 1 ? '"' . $option . '"' : $option,
+                        $nestingLevel > 1 ? ' =>' : ':',
                         $value
                     );
                 }

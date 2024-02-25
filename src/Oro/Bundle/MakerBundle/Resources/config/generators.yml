@@ -9,7 +9,7 @@ services:
 
     Oro\Bundle\MakerBundle\Generator\DoctrineEntityGenerator:
         arguments:
-            - '@Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer'
+            - '@Oro\Bundle\MakerBundle\Renderer\AttributeRenderer'
             - '@Oro\Bundle\MakerBundle\Helper\EntityInstallerHelper'
             - '@Oro\Bundle\MakerBundle\Helper\OroEntityHelper'
         tags:

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\MakerBundle\Helper;
 
 use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
-use Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer;
 use Oro\Bundle\MakerBundle\Util\ClassSourceManipulator;
 use Symfony\Bundle\MakerBundle\Doctrine\EntityRelation;
 use Symfony\Bundle\MakerBundle\FileManager;
@@ -25,13 +24,10 @@ class OroEntityHelper
     ];
 
     private FileManager $fileManager;
-    private AnnotationRenderer $annotationRenderer;
 
     public function __construct(
-        AnnotationRenderer $phpDocRenderer,
         FileManager $fileManager
     ) {
-        $this->annotationRenderer = $phpDocRenderer;
         $this->fileManager = $fileManager;
     }
 
@@ -426,8 +422,7 @@ class OroEntityHelper
         string $entityPath
     ): ClassSourceManipulator {
         return new ClassSourceManipulator(
-            $this->fileManager->getFileContents($entityPath),
-            $this->annotationRenderer
+            $this->fileManager->getFileContents($entityPath)
         );
     }
 }

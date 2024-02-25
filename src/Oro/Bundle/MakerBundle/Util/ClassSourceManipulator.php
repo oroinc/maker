@@ -20,8 +20,15 @@ namespace Oro\Bundle\MakerBundle\Util;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\InverseJoinColumn;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinTable;
+use Doctrine\ORM\Mapping\ManyToMany;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToOne;
+use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\MakerBundle\Helper\OroEntityHelper;
-use Oro\Bundle\MakerBundle\Renderer\AnnotationRenderer;
 use PhpParser\Builder;
 use PhpParser\BuilderHelpers;
 use PhpParser\Lexer;
@@ -37,6 +44,7 @@ use Symfony\Bundle\MakerBundle\Doctrine\RelationManyToOne;
 use Symfony\Bundle\MakerBundle\Doctrine\RelationOneToMany;
 use Symfony\Bundle\MakerBundle\Doctrine\RelationOneToOne;
 use Symfony\Bundle\MakerBundle\Str;
+use Symfony\Bundle\MakerBundle\Util\ClassNameValue;
 use Symfony\Bundle\MakerBundle\Util\PrettyPrinter;
 
 /**
@@ -64,15 +72,12 @@ final class ClassSourceManipulator
     private $newStmts;
 
     private array $pendingComments = [];
-    private AnnotationRenderer $annotationRenderer;
 
     public function __construct(
         string $sourceCode,
-        AnnotationRenderer $annotationRenderer,
         bool $overwrite = false,
         bool $fluentMutators = true
     ) {
-        $this->annotationRenderer = $annotationRenderer;
         $this->overwrite = $overwrite;
         $this->fluentMutators = $fluentMutators;
         /* @legacy Support for nikic/php-parser v4 */
@@ -111,11 +116,11 @@ final class ClassSourceManipulator
         $fieldOptions = OroEntityHelper::getFieldOptions($fieldName, $fieldConfig);
         $typeHint = $this->getEntityTypeHint($fieldConfig['type']);
 
-        $fieldAnnotations = [];
-        $fieldAnnotations[] = $this->annotationRenderer->getLines('ORM\Column', $fieldOptions);
-        $this->addFieldConfig($fieldName, $fieldConfig, $identityFields, $fieldAnnotations, $isRelatedEntity);
+        $attributes[] = $this->buildAttributeNode(Column::class, $fieldOptions, 'ORM');
 
-        $this->addProperty($fieldName, array_merge(...$fieldAnnotations));
+        $this->addFieldConfig($fieldName, $fieldConfig, $identityFields, $attributes, $isRelatedEntity);
+
+        $this->addProperty($fieldName, $attributes);
         $this->addGetter(
             $fieldName,
             $typeHint,
@@ -226,7 +231,7 @@ final class ClassSourceManipulator
         $this->addMethod($builder->getNode());
     }
 
-    public function addProperty(string $name, array $annotationLines = [], $defaultValue = null): void
+    public function addProperty(string $name, array $attributes = [], $defaultValue = null): void
     {
         $name = Str::asLowerCamelCase($name);
         if ($this->propertyExists($name)) {
@@ -236,8 +241,8 @@ final class ClassSourceManipulator
 
         $newPropertyBuilder = (new Builder\Property($name))->makePrivate();
 
-        if ($annotationLines) {
-            $newPropertyBuilder->setDocComment($this->createDocBlock($annotationLines));
+        foreach ($attributes as $attribute) {
+            $newPropertyBuilder->addAttribute($attribute);
         }
 
         if (null !== $defaultValue) {
@@ -323,43 +328,49 @@ final class ClassSourceManipulator
             $typeHint = 'self';
         }
 
-        $annotationOptions = [
+        $options = [
             'targetEntity' => $relation->getTargetClassName(),
         ];
         if ($relation->isOwning()) {
             // sometimes, we don't map the inverse relation
             if ($relation->getMapInverseRelation()) {
-                $annotationOptions['inversedBy'] = Str::asLowerCamelCase($relation->getTargetPropertyName());
+                $options['inversedBy'] = Str::asLowerCamelCase($relation->getTargetPropertyName());
             }
         } else {
-            $annotationOptions['mappedBy'] = Str::asLowerCamelCase($relation->getTargetPropertyName());
+            $options['mappedBy'] = Str::asLowerCamelCase($relation->getTargetPropertyName());
         }
 
         if ($relation instanceof RelationOneToOne) {
-            $annotationOptions['cascade'] = ['persist', 'remove'];
+            $options['cascade'] = ['persist', 'remove'];
         }
 
-        $annotations = [];
-        $annotations[] = $this->annotationRenderer->getLines(
-            $relation instanceof RelationManyToOne ? 'ORM\\ManyToOne' : 'ORM\\OneToOne',
-            $annotationOptions
+        $attributes = [];
+        $attributes[] = $this->buildAttributeNode(
+            $relation instanceof RelationManyToOne ? ManyToOne::class : OneToOne::class,
+            $options,
+            'ORM'
         );
 
         if ($relation->isOwning()) {
-            $annotations[] = $this->annotationRenderer->getLines(
-                'ORM\\JoinColumn',
-                [
-                    'name' => Str::asSnakeCase($relation->getPropertyName()) . '_id',
-                    'nullable' => $relation->isNullable(),
-                    'onDelete' => $relation->isNullable() ? 'SET NULL' : 'CASCADE'
-                ]
+            $options  = [
+                'name' => Str::asSnakeCase($relation->getPropertyName()) . '_id',
+                'nullable' => $relation->isNullable(),
+                'onDelete' => $relation->isNullable() ? 'SET NULL' : 'CASCADE'
+            ];
+
+            $attributes[] = $this->buildAttributeNode(
+                JoinColumn::class,
+                $options,
+                'ORM'
             );
         }
+
         if (!$relation->isOwning()) {
             $fieldConfig = ['disable_data_audit' => true, 'disable_import_export' => true];
         }
-        $this->addFieldConfig($fieldName, $fieldConfig, [], $annotations);
-        $this->addProperty($relation->getPropertyName(), array_merge(...$annotations));
+
+        $this->addFieldConfig($fieldName, $fieldConfig, [], $attributes);
+        $this->addProperty($relation->getPropertyName(), $attributes);
 
         $this->addGetter(
             $relation->getPropertyName(),
@@ -422,68 +433,65 @@ final class ClassSourceManipulator
         $arrayCollectionTypeHint = $this->addUseStatementIfNecessary(ArrayCollection::class);
         $collectionTypeHint = $this->addUseStatementIfNecessary(Collection::class);
 
-        $annotationOptions = [
+        $options = [
             'targetEntity' => $relation->getTargetClassName(),
         ];
         if ($relation->isOwning()) {
             // sometimes, we don't map the inverse relation
             if ($relation->getMapInverseRelation()) {
-                $annotationOptions['inversedBy'] = Str::asLowerCamelCase($relation->getTargetPropertyName());
+                $options['inversedBy'] = Str::asLowerCamelCase($relation->getTargetPropertyName());
             }
         } else {
-            $annotationOptions['mappedBy'] = Str::asLowerCamelCase($relation->getTargetPropertyName());
+            $options['mappedBy'] = Str::asLowerCamelCase($relation->getTargetPropertyName());
         }
 
         if ($relation->getOrphanRemoval()) {
-            $annotationOptions['orphanRemoval'] = true;
+            $options['orphanRemoval'] = true;
         }
 
-        $annotations = [];
+        $attributes = [];
         if ($relation instanceof RelationManyToMany) {
-            $annotations[] = $this->annotationRenderer->getLines('ORM\\ManyToMany', $annotationOptions);
-            $annotations[] = $this->annotationRenderer->getLines(
-                'ORM\JoinTable',
+            $attributes[] = $this->buildAttributeNode(
+                ManyToMany::class,
+                $options,
+                'ORM'
+            );
+
+            $attributes[] = $this->buildAttributeNode(
+                JoinTable::class,
+                ['name' => $config['join_table']],
+                'ORM'
+            );
+
+            $attributes[] = $this->buildAttributeNode(
+                JoinColumn::class,
                 [
-                    'name' => $config['join_table'],
-                    'joinColumns' => [
-                        implode(
-                            '',
-                            $this->annotationRenderer->getLines(
-                                'ORM\JoinColumn',
-                                [
-                                    'name' => $config['join_column'],
-                                    'referencedColumnName' => 'id',
-                                    'onDelete' => 'CASCADE'
-                                ],
-                                true
-                            )
-                        )
-                    ],
-                    'inverseJoinColumns' => [
-                        implode(
-                            '',
-                            $this->annotationRenderer->getLines(
-                                'ORM\JoinColumn',
-                                [
-                                    'name' => $config['inverse_join_column'],
-                                    'referencedColumnName' => 'id',
-                                    'onDelete' => 'CASCADE'
-                                ],
-                                true
-                            )
-                        )
-                    ]
-                ]
+                    'name' => $config['join_column'],
+                    'referencedColumnName' => 'id',
+                    'onDelete' => 'CASCADE'
+                ],
+                'ORM'
+            );
+
+            $attributes[] = $this->buildAttributeNode(
+                InverseJoinColumn::class,
+                [
+                    'name' => $config['inverse_join_column'],
+                    'referencedColumnName' => 'id',
+                    'onDelete' => 'CASCADE'
+                ],
+                'ORM'
             );
         } else {
-            $annotations[] = $this->annotationRenderer->getLines('ORM\\OneToMany', $annotationOptions);
+            $attributes[] = $this->buildAttributeNode(ManyToMany::class, $options, 'ORM');
         }
 
         if (!$relation->isOwning()) {
             $fieldConfig = ['disable_data_audit' => true, 'disable_import_export' => true];
         }
-        $this->addFieldConfig($fieldName, $fieldConfig, [], $annotations);
-        $this->addProperty($relation->getPropertyName(), array_merge(...$annotations));
+
+        $this->addFieldConfig($fieldName, $fieldConfig, [], $attributes);
+        $this->addProperty($relation->getPropertyName(), $attributes);
 
         // logic to avoid re-adding the same ArrayCollection line
         $this->updateConstructWithCollection($relation, $arrayCollectionTypeHint);
@@ -1241,8 +1249,8 @@ final class ClassSourceManipulator
     {
         foreach ($this->getClassNode()->stmts as $i => $node) {
             if ($node instanceof Node\Stmt\ClassMethod && strtolower($node->name->toString()) === strtolower(
-                    $methodName
-                )) {
+                $methodName
+            )) {
                 return $i;
             }
         }
@@ -1265,7 +1273,7 @@ final class ClassSourceManipulator
         string $fieldName,
         array $fieldConfig,
         array $identityFields,
-        array &$fieldAnnotations,
+        array &$attributes,
         bool $isRelatedEntity = false
     ): void {
         $configData = [];
@@ -1293,10 +1301,118 @@ final class ClassSourceManipulator
         }
 
         if ($configData) {
-            $fieldAnnotations[] = $this->annotationRenderer->getLines(
-                'ConfigField',
+            $attributes[] = $this->buildAttributeNode(
+                ConfigField::class,
                 ['defaultValues' => $configData]
             );
         }
+    }
+
+    /**
+     * Builds a PHPParser attribute node.
+     *
+     * $attributeClass  The attribute class which should be used for the attribute E.g. #[Column()]
+     * $options         The named arguments for the attribute ($key = argument name, $value = argument value)
+     * $attributePrefix If a prefix is provided, the node is built using the prefix. E.g. #[ORM\Column()]
+     */
+    private function buildAttributeNode(
+        string $attributeClass,
+        array $options,
+        ?string $attributePrefix = null
+    ): Node\Attribute {
+        $options = $this->sortOptionsByClassConstructorParameters($options, $attributeClass);
+
+        $context = $this;
+        $nodeArguments = array_map(static function ($option, $value) use ($context) {
+            return new Node\Arg($context->buildNodeExprByValue($value), false, false, [], new Node\Identifier($option));
+        }, array_keys($options), array_values($options));
+
+        $class = $attributePrefix ? sprintf(
+            '%s\\%s',
+            $attributePrefix,
+            Str::getShortClassName($attributeClass)
+        ) : Str::getShortClassName($attributeClass);
+
+        return new Node\Attribute(
+            new Node\Name($class),
+            $nodeArguments
+        );
+    }
+
+    /**
+     * sort the given options based on the constructor parameters for the given $classString
+     * this prevents code inspections warnings for IDEs like intellij/phpstorm.
+     *
+     * option keys that are not found in the constructor will be added at the end of the sorted array
+     */
+    private function sortOptionsByClassConstructorParameters(array $options, string $classString): array
+    {
+        if ('ORM\\' === substr($classString, 0, 4)) {
+            $classString = sprintf('Doctrine\\ORM\\Mapping\\%s', substr($classString, 4));
+        }
+
+        $constructorParameterNames = array_map(static function (\ReflectionParameter $reflectionParameter) {
+            return $reflectionParameter->getName();
+        }, (new \ReflectionClass($classString))->getConstructor()->getParameters());
+
+        $sorted = [];
+        foreach ($constructorParameterNames as $name) {
+            if (\array_key_exists($name, $options)) {
+                $sorted[$name] = $options[$name];
+                unset($options[$name]);
+            }
+        }
+
+        return array_merge($sorted, $options);
+    }
+
+    /**
+     * builds a PHPParser Expr Node based on the value given in $value
+     * throws an Exception when the given $value is not resolvable by this method.
+     */
+    private function buildNodeExprByValue($value): Node\Expr
+    {
+        switch (\gettype($value)) {
+            case 'string':
+                $nodeValue = new Node\Scalar\String_($value);
+                break;
+            case 'integer':
+                $nodeValue = new Node\Scalar\LNumber($value);
+                break;
+            case 'double':
+                $nodeValue = new Node\Scalar\DNumber($value);
+                break;
+            case 'boolean':
+                $nodeValue = new Node\Expr\ConstFetch(new Node\Name($value ? 'true' : 'false'));
+                break;
+            case 'array':
+                $context = $this;
+                $arrayItems = array_map(static function ($key, $value) use ($context) {
+                    return new Node\Expr\ArrayItem(
+                        $context->buildNodeExprByValue($value),
+                        !\is_int($key) ? $context->buildNodeExprByValue($key) : null
+                    );
+                }, array_keys($value), array_values($value));
+                $nodeValue = new Node\Expr\Array_($arrayItems, ['kind' => Node\Expr\Array_::KIND_SHORT]);
+                break;
+            default:
+                $nodeValue = null;
+        }
+
+        if (null === $nodeValue) {
+            if ($value instanceof ClassNameValue) {
+                $nodeValue = new Node\Expr\ConstFetch(
+                    new Node\Name(
+                        sprintf('%s::class', $value->isSelf() ? 'self' : $value->getShortName())
+                    )
+                );
+            } else {
+                throw new \Exception(
+                    sprintf('Cannot build a node expr for value of type "%s"', \gettype($value))
+                );
+            }
+        }
+
+        return $nodeValue;
     }
 }

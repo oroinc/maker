@@ -141,7 +141,6 @@ class EntityInstallerHelper
 
                     break;
                 default:
-
                     $tables[$tableName]['fields'][$fieldName] = [
                         'type' => $installerOptions['type'],
                         'options' => $this->getInstallerFieldOptions($installerOptions)
