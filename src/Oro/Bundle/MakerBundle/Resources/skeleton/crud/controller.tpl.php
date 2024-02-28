@@ -15,10 +15,9 @@ class <?= $class_name; ?> extends AbstractController
 <?php foreach ($detach_actions as $detach_action): ?>
     /**
      * Detach <?= $detach_action['target_entity_class'] ?> from <?= $short_class_name . PHP_EOL ?>
-     *
-     * @ParamConverter("holder", options={"id"="holderEntityId"})
-     * @ParamConverter("entity", options={"id"="entityId"})
      */
+    #[ParamConverter("holder", options: ["id" => "holderEntityId"])]
+    #[ParamConverter("entity", options: ["id" => "entityId"])]
     #[Route(
         path: "/{holderEntityId}/<?= str_replace('_', '-', $detach_action['plural_field_name']) ?>/{entityId}/detach",
         name: "<?= $detach_action['route_prefix'] ?>_detach",

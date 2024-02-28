@@ -26,6 +26,7 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\MakerBundle\Helper\OroEntityHelper;
@@ -483,7 +484,7 @@ final class ClassSourceManipulator
                 'ORM'
             );
         } else {
-            $attributes[] = $this->buildAttributeNode(ManyToMany::class, $options, 'ORM');
+            $attributes[] = $this->buildAttributeNode(OneToMany::class, $options, 'ORM');
         }
 
         if (!$relation->isOwning()) {
