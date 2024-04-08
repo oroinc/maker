@@ -13,7 +13,7 @@
     "exclude-from-classmap": ["/Tests/"]
   },
   "require": {
-    "oro/platform": "6.0.*",
+    "oro/platform": "6.1.*",
     "symfony/maker-bundle": "^v1.52.0"
   },
   "repositories": {
@@ -26,7 +26,7 @@
   "prefer-stable": true,
   "extra": {
     "branch-alias": {
-      "dev-master": "6.0-dev"
+      "dev-master": "6.1-dev"
     }
   }
 }
