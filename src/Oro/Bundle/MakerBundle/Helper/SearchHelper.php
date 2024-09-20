@@ -113,14 +113,8 @@ class SearchHelper
                 if ($fieldType === 'enum') {
                     $fields[] = [
                         'name' => $name,
-                        'relation_type' => 'many-to-one',
-                        'relation_fields' => [
-                            [
-                                'name' => 'name',
-                                'target_type' => 'text',
-                                'target_fields' => [$name . 'Name']
-                            ]
-                        ]
+                        'target_type' => 'text',
+                        'target_fields' => [$name . 'Name']
                     ];
 
                     continue;

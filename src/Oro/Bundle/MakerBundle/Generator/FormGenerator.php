@@ -267,9 +267,15 @@ class FormGenerator implements GeneratorInterface
                 break;
 
             case 'enum':
-            case 'enum[]':
                 $formType = 'Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType';
                 $options = ['enum_code' => MetadataStorage::getFieldMetadata($entityName, $fieldName, 'enum_code')];
+                break;
+            case 'enum[]':
+                $formType = 'Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType';
+                $options = [
+                    'enum_code' => MetadataStorage::getFieldMetadata($entityName, $fieldName, 'enum_code'),
+                    'multiple' => true
+                ];
                 break;
 
             default:

@@ -99,7 +99,7 @@ class EntityInstallerHelper
                     break;
                 case 'enum':
                 case 'enum[]':
-                    $this->fillEnumRelationConfig(
+                    $this->fillEnumConfig(
                         $tables,
                         $fieldName,
                         $entityName,
@@ -296,7 +296,7 @@ class EntityInstallerHelper
         ];
     }
 
-    protected function fillEnumRelationConfig(
+    protected function fillEnumConfig(
         array &$tables,
         string $fieldName,
         string $entityName,

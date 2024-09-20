@@ -349,7 +349,7 @@ class DoctrineEntityGenerator implements GeneratorInterface
 
                 $values = [];
                 foreach ($fieldConfig['values'] ?? [] as $value) {
-                    $values[ExtendHelper::buildEnumValueId($value)] = $value;
+                    $values[ExtendHelper::buildEnumInternalId($value)] = $value;
                 }
 
                 $generator->generateClass(

@@ -466,8 +466,14 @@ class GridHelper
             if (OroEntityHelper::isRelation($fieldConfig)) {
                 if ($fieldConfig['type'] === 'enum') {
                     $gridConfig['source']['query']['join']['left'][] = [
-                        'join' => 'e.' . Str::asSnakeCase($fieldName),
-                        'alias' => $field
+                        'join' => 'Oro\Bundle\EntityExtendBundle\Entity\EnumOption',
+                        'alias' => $field,
+                        'conditionType' => 'WITH',
+                        'condition' => sprintf(
+                            "JSON_EXTRACT(e.serialized_data, '%s') = %s",
+                            Str::asSnakeCase($fieldName),
+                            $field
+                        )
                     ];
                     $gridConfig['source']['query']['select'][] = sprintf('%1$s.id as %1$sId', $field);
                     $gridConfig['source']['query']['select'][] = sprintf('%1$s.name as %1$sName', $field);
