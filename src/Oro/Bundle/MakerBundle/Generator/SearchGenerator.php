@@ -16,6 +16,7 @@ use Symfony\Bundle\MakerBundle\Str;
  */
 class SearchGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         foreach ($configData['entities'] as $entityName => $entityConfig) {

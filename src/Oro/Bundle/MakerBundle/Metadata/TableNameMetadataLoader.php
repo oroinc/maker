@@ -17,6 +17,7 @@ class TableNameMetadataLoader implements ClassMetadataLoaderInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    #[\Override]
     public function getClassMetadataValue(string $entityClass, string $key): mixed
     {
         if ($key !== 'table_name') {

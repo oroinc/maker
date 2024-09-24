@@ -19,6 +19,7 @@ class EntityFieldsMetadataLoader implements ClassMetadataLoaderInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    #[\Override]
     public function getClassMetadataValue(string $entityClass, string $key): mixed
     {
         if ($key !== 'entity_fields') {

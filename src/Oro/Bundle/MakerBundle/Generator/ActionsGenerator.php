@@ -11,6 +11,7 @@ use Symfony\Bundle\MakerBundle\Generator;
  */
 class ActionsGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $actions = ActionsHelper::getActions($configData, $generator, $srcPath);

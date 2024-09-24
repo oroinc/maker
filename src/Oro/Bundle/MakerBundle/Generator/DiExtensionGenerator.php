@@ -14,6 +14,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DiExtensionGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         if (MetadataStorage::getGlobalMetadata('bundle_less')) {

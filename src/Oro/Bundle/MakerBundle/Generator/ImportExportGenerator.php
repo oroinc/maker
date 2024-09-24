@@ -14,6 +14,7 @@ use Symfony\Bundle\MakerBundle\Str;
  */
 class ImportExportGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $uses = [

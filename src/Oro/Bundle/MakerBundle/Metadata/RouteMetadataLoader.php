@@ -14,6 +14,7 @@ class RouteMetadataLoader implements ClassMetadataLoaderInterface
     ) {
     }
 
+    #[\Override]
     public function getClassMetadataValue(string $entityClass, string $key): mixed
     {
         if (!str_starts_with($key, 'route_')) {

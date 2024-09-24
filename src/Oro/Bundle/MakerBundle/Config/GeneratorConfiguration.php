@@ -66,6 +66,7 @@ class GeneratorConfiguration implements ConfigurationInterface
         return $processedConfig;
     }
 
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('generate');

@@ -12,6 +12,7 @@ use Symfony\Bundle\MakerBundle\Str;
  */
 class BundleGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         // Skip bundle class generation for bundle-less structure

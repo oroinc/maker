@@ -16,9 +16,7 @@ class <?= $short_class_name ?>Reader extends EntityReader
 {
     private int $holderEntityId;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createSourceEntityQueryBuilder($entityName, Organization $organization = null, array $ids = [])
     {
         $qb = parent::createSourceEntityQueryBuilder($entityName, $organization, $ids);
@@ -36,9 +34,7 @@ class <?= $short_class_name ?>Reader extends EntityReader
         return $qb;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeFromContext(ContextInterface $context)
     {
         $this->holderEntityId = (int)$context->getOption('holder_entity_id');

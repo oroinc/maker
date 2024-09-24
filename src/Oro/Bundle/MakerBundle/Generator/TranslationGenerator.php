@@ -11,6 +11,7 @@ use Symfony\Bundle\MakerBundle\Generator;
  */
 class TranslationGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $translations = TranslationHelper::getTranslationStrings($configData);

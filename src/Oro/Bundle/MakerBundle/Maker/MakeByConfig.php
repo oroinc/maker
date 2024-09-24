@@ -52,11 +52,13 @@ class MakeByConfig extends AbstractMaker
         }
     }
 
+    #[\Override]
     public static function getCommandName(): string
     {
         return 'make:by-config';
     }
 
+    #[\Override]
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
@@ -64,6 +66,7 @@ class MakeByConfig extends AbstractMaker
             ->addOption('bundle-less', null, InputOption::VALUE_NONE, 'Generate Bundle-less folder structure');
     }
 
+    #[\Override]
     public function configureDependencies(DependencyBuilder $dependencies)
     {
         $dependencies->addClassDependency(
@@ -97,6 +100,7 @@ class MakeByConfig extends AbstractMaker
         );
     }
 
+    #[\Override]
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
         $configPath = $input->getArgument('config-path');

@@ -40,6 +40,7 @@ class DoctrineEntityGenerator implements GeneratorInterface
         $this->entityHelper = $entityHelper;
     }
 
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $hasChanges = $this->generateEntityClasses($generator, $configData, $srcPath);

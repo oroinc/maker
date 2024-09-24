@@ -25,6 +25,7 @@ class TitleMetadataLoader implements ClassMetadataLoaderInterface
         'Oro\Bundle\UserBundle\Entity\User' => 'fullName'
     ];
 
+    #[\Override]
     public function getClassMetadataValue(string $entityClass, string $key): mixed
     {
         if ($key !== 'entity_title') {

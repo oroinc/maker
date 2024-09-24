@@ -19,6 +19,7 @@ class GridNameMetadataLoader implements ClassMetadataLoaderInterface
     ) {
     }
 
+    #[\Override]
     public function getClassMetadataValue(string $entityClass, string $key): mixed
     {
         if ($key !== 'grid_name') {

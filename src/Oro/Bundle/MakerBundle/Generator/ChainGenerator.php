@@ -19,6 +19,7 @@ class ChainGenerator implements GeneratorInterface
         $this->generators = $generators;
     }
 
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         foreach ($this->generators as $codeGenerator) {

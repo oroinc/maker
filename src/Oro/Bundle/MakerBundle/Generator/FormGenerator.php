@@ -19,6 +19,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
  */
 class FormGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $formTypes = [];

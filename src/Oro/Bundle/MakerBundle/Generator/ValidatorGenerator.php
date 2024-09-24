@@ -11,6 +11,7 @@ use Symfony\Bundle\MakerBundle\Generator;
  */
 class ValidatorGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $config = ValidationHelper::getValidatorConfiguration($configData);

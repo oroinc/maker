@@ -9,6 +9,7 @@ use Symfony\Bundle\MakerBundle\FileManager as BaseFileManager;
  */
 class FileManager extends BaseFileManager
 {
+    #[\Override]
     public function getRelativePathForFutureClass(string $className): ?string
     {
         return rtrim($this->getRootDirectory(), DIRECTORY_SEPARATOR)

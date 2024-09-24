@@ -16,6 +16,7 @@ class GridGenerator implements GeneratorInterface
     ) {
     }
 
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $config = $this->gridHelper->getGridsConfiguration($configData);

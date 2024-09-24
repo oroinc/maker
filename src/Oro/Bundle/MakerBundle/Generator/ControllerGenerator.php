@@ -18,6 +18,7 @@ use Symfony\Bundle\MakerBundle\Str;
  */
 class ControllerGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $controllers = [];

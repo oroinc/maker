@@ -11,6 +11,7 @@ use Symfony\Bundle\MakerBundle\Generator;
  */
 class MenuGenerator implements GeneratorInterface
 {
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $config = MenuHelper::getMenuConfig($configData);

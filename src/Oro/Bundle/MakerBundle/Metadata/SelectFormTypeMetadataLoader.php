@@ -17,6 +17,7 @@ class SelectFormTypeMetadataLoader implements ClassMetadataLoaderInterface
     ) {
     }
 
+    #[\Override]
     public function getClassMetadataValue(string $entityClass, string $key): mixed
     {
         if ($key !== 'select_form_type') {

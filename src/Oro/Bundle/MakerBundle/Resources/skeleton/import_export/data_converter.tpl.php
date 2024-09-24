@@ -14,17 +14,13 @@ class <?= $short_class_name ?>DataConverter extends ConfigurableTableDataConvert
 {
     private ContextInterface $context;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context)
     {
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
         if ($this->context && empty($importedRecord['<?= $relation_owner_field ?>_id'])) {

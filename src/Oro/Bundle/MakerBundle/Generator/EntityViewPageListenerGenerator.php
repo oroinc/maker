@@ -20,6 +20,7 @@ class EntityViewPageListenerGenerator implements GeneratorInterface
     ) {
     }
 
+    #[\Override]
     public function generate(Generator $generator, array &$configData, string $srcPath): bool
     {
         $eventListeners = [];
