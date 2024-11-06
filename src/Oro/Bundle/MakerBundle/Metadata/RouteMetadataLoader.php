@@ -31,13 +31,13 @@ class RouteMetadataLoader implements ClassMetadataLoaderInterface
         }
 
         try {
-            return $this->configManager->getEntityMetadata($entityClass)->getRoute($routeType);
+            return $this->configManager->getEntityMetadata($entityClass)->getRoute($routeType, true);
         } catch (\Exception $e) {
             try {
                 if ($routeType === 'name') {
                     return null;
                 }
-                $indexRoute = $this->configManager->getEntityMetadata($entityClass)->getRoute('name');
+                $indexRoute = $this->configManager->getEntityMetadata($entityClass)->getRoute('name', true);
 
                 return preg_replace('/_index$/', '_' . $routeType, $indexRoute);
             } catch (\Exception $e) {

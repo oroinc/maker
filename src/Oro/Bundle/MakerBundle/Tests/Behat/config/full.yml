@@ -26,6 +26,8 @@ generate:
                     type: text
                     disable_data_audit: true
                     disable_import_export: true
+                relation_with_non_standard_id:
+                    type: '@Oro\Bundle\AddressBundle\Entity\Country'
                 image_field:
                     type: image
                 enumField:

@@ -34,7 +34,8 @@ class IdInfoMetadataLoader implements ClassMetadataLoaderInterface
 
         return [
             'field_name' => $idFieldName,
-            'field_type' => $idFieldType
+            'field_type' => $idFieldType,
+            'column_name' => $metadata->getIdentifierColumnNames()[0]
         ];
     }
 }

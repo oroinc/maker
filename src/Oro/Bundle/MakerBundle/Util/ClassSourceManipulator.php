@@ -136,9 +136,10 @@ final class ClassSourceManipulator
     public function addManyToOneRelation(
         RelationManyToOne $manyToOne,
         string $fieldName,
-        array $fieldConfig
+        array $fieldConfig,
+        string $relatedEntityPk = 'id'
     ): void {
-        $this->addSingularRelation($manyToOne, $fieldName, $fieldConfig);
+        $this->addSingularRelation($manyToOne, $fieldName, $fieldConfig, $relatedEntityPk);
     }
 
     public function addOneToManyRelation(
@@ -322,15 +323,22 @@ final class ClassSourceManipulator
         return $setterNodeBuilder;
     }
 
-    private function addSingularRelation(BaseRelation $relation, string $fieldName, array $fieldConfig): void
-    {
+    private function addSingularRelation(
+        BaseRelation $relation,
+        string $fieldName,
+        array $fieldConfig,
+        string $relatedEntityPk = 'id'
+    ): void {
         $typeHint = $this->addUseStatementIfNecessary($relation->getTargetClassName());
         if ($relation->getTargetClassName() == $this->getThisFullClassName()) {
             $typeHint = 'self';
         }
 
         $options = [
-            'targetEntity' => $relation->getTargetClassName(),
+            'targetEntity' => new ClassNameValue(
+                Str::getShortClassName($relation->getTargetClassName()),
+                $relation->getTargetClassName()
+            )
         ];
         if ($relation->isOwning()) {
             // sometimes, we don't map the inverse relation
@@ -353,11 +361,14 @@ final class ClassSourceManipulator
         );
 
         if ($relation->isOwning()) {
-            $options  = [
-                'name' => Str::asSnakeCase($relation->getPropertyName()) . '_id',
+            $options = [
+                'name' => Str::asSnakeCase($relation->getPropertyName()) . '_' . $relatedEntityPk,
                 'nullable' => $relation->isNullable(),
                 'onDelete' => $relation->isNullable() ? 'SET NULL' : 'CASCADE'
             ];
+            if ($relatedEntityPk !== 'id') {
+                $options['referencedColumnName'] = $relatedEntityPk;
+            }
 
             $attributes[] = $this->buildAttributeNode(
                 JoinColumn::class,
@@ -435,7 +446,10 @@ final class ClassSourceManipulator
         $collectionTypeHint = $this->addUseStatementIfNecessary(Collection::class);
 
         $options = [
-            'targetEntity' => $relation->getTargetClassName(),
+            'targetEntity' => new ClassNameValue(
+                Str::getShortClassName($relation->getTargetClassName()),
+                $relation->getTargetClassName()
+            )
         ];
         if ($relation->isOwning()) {
             // sometimes, we don't map the inverse relation
@@ -1250,8 +1264,8 @@ final class ClassSourceManipulator
     {
         foreach ($this->getClassNode()->stmts as $i => $node) {
             if ($node instanceof Node\Stmt\ClassMethod && strtolower($node->name->toString()) === strtolower(
-                $methodName
-            )) {
+                    $methodName
+                )) {
                 return $i;
             }
         }

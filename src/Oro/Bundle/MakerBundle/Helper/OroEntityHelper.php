@@ -193,7 +193,16 @@ class OroEntityHelper
             case EntityRelation::MANY_TO_ONE:
                 if ($relation->getOwningClass() === $entityClass) {
                     // THIS class will receive the ManyToOne
-                    $manipulator->addManyToOneRelation($relation->getOwningRelation(), $fieldName, $fieldConfig);
+                    $relatedEntityIdInfo = MetadataStorage::getClassMetadata(
+                        $fieldConfig['relation_target'],
+                        'id_info'
+                    );
+                    $manipulator->addManyToOneRelation(
+                        $relation->getOwningRelation(),
+                        $fieldName,
+                        $fieldConfig,
+                        $relatedEntityIdInfo['column_name'] ?? 'id'
+                    );
 
                     if ($relation->getMapInverseRelation()) {
                         $otherManipulator->addOneToManyRelation(
@@ -241,7 +250,9 @@ class OroEntityHelper
                         $fieldConfig
                     );
                     if (!$relation->getMapInverseRelation()) {
-                        throw new \Exception('Somehow a OneToMany relationship is being created, but the inverse side will not be mapped?');
+                        throw new \Exception(
+                            'Somehow a OneToMany relationship is being created, but the inverse side will not be mapped?'
+                        );
                     }
                     $manipulator->addOneToManyRelation(
                         $relation->getInverseRelation(),
