@@ -41,6 +41,10 @@ class FormGenerator implements GeneratorInterface
         }
 
         foreach ($configData['entities'] as $entityName => $entityConfig) {
+            if (CrudHelper::isReadOnly($entityConfig)) {
+                continue;
+            }
+
             $formTypes[] = $this->generateEntityFormType($generator, $entityName, $entityConfig);
         }
 
@@ -135,7 +139,8 @@ class FormGenerator implements GeneratorInterface
                 'entity_class_name' => $entityClass,
                 'autocomplete_alias' => $autocompleteAlias,
                 'routes' => $routes,
-                'select_grid_name' => GridHelper::getSelectGridName($entityName)
+                'select_grid_name' => GridHelper::getSelectGridName($entityName),
+                'create_enabled' => !CrudHelper::isReadOnly($configData['entities'][$entityName])
             ]
         );
         $org = Str::asSnakeCase($configData['options']['organization']);

@@ -73,6 +73,7 @@ class DoctrineEntityGenerator implements GeneratorInterface
                 'is_related_entity',
                 !empty($entityConfig['configuration']['is_related_entity'])
             );
+            MetadataStorage::addClassMetadata($entityFQCN, 'read_only', CrudHelper::isReadOnly($entityConfig));
             MetadataStorage::addClassMetadata($entityFQCN, 'prefix', $entityNamePrefixedWithBundle);
             MetadataStorage::addClassMetadata($entityFQCN, 'table_name', $entityNamePrefixedWithBundle);
             MetadataStorage::addClassMetadata(

@@ -21,8 +21,12 @@ class <?= $class_name ?> extends AbstractType
         $resolver->setDefaults(
             [
                 'autocomplete_alias' => '<?= $autocomplete_alias ?>',
+                'grid_name' => '<?= $select_grid_name ?>',
+<?php if ($create_enabled): ?>
                 'create_form_route' => '<?= $routes['create'] ?>',
-                'grid_name' => '<?= $select_grid_name ?>'
+<?php else: ?>
+                'create_enabled' => false,
+<?php endif; ?>
             ]
         );
     }

@@ -69,6 +69,8 @@ generate:
                     type: '@entity_without_crud[]'
                 many_to_one_external_relation:
                     type: '@Oro\Bundle\UserBundle\Entity\User'
+                read_only_relation:
+                    type: '@entity_read_only'
         entityTwo:
             configuration:
                 owner: user
@@ -92,6 +94,13 @@ generate:
                     relation_type: many-to-many
                     relation_target: 'Oro\Bundle\UserBundle\Entity\User'
                     is_owning_side: false
+        entity_read_only:
+            configuration:
+                owner: user
+                read_only: true
+            fields:
+                name:
+                    type: string
         entity_without_crud:
             configuration:
                 is_related_entity: true

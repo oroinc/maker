@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MakerBundle\Generator;
 
+use Oro\Bundle\MakerBundle\Helper\CrudHelper;
 use Oro\Bundle\MakerBundle\Helper\ImportExportHelper;
 use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
@@ -49,7 +50,8 @@ class ImportExportGenerator implements GeneratorInterface
                     'uses' => array_merge($uses, [$className]),
                     'short_class_name' => $shortClassName,
                     'has_export_template' => false,
-                    'export_job_name' => $exportJobName
+                    'export_job_name' => $exportJobName,
+                    'disable_import' => CrudHelper::isReadOnly($entityConfig)
                 ]
             );
 

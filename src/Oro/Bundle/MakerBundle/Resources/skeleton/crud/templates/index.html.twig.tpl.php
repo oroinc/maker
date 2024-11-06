@@ -12,6 +12,7 @@
     } %}
 
 <?php endif ?>
+<?php if ($allow_create): ?>
     {% if is_granted('<?= $create_acl ?>') %}
         <div class="btn-group">
         {{ UI.addButton({
@@ -20,4 +21,5 @@
         }) }}
         </div>
     {% endif %}
+<?php endif; ?>
 {% endblock %}

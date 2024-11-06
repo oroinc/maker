@@ -19,6 +19,11 @@ class CrudHelper
             && empty($entityConfig['configuration']['is_related_entity']);
     }
 
+    public static function isReadOnly(array $entityConfig): bool
+    {
+        return !empty($entityConfig['configuration']['read_only']);
+    }
+
     public static function getRouteNames(string $entityName): array
     {
         $routePrefix = MetadataStorage::getClassMetadata($entityName, 'prefix');
