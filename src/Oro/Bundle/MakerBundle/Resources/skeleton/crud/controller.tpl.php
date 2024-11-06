@@ -7,7 +7,6 @@ namespace <?= $namespace; ?>;
 
 /**
  * Contains CRUD actions for <?= $short_class_name . PHP_EOL ?>
- *
  */
 #[Route(path: "/<?= $entity_name ?>", name: "<?= $route_prefix ?>_")]
 class <?= $class_name; ?> extends AbstractController
@@ -66,6 +65,7 @@ class <?= $class_name; ?> extends AbstractController
         ];
     }
 
+<?php if (!$is_read_only): ?>
     /**
      * Create <?= $short_class_name . PHP_EOL ?>
      *
@@ -122,13 +122,15 @@ class <?= $class_name; ?> extends AbstractController
         );
     }
 
+<?php endif; ?>
     public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
-                UpdateHandlerFacade::class,
+<?php if (!$is_read_only): ?>                UpdateHandlerFacade::class,
+<?php endif; ?>
                 ManagerRegistry::class
             ]
         );

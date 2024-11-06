@@ -1,5 +1,9 @@
 oro_behat_extension:
   elements:
+    Entity Read Only Select Create Button:
+      selector:
+        type: 'xpath'
+        locator: '//div[contains(@id, "entity_one_readOnlyRelation")]//button[contains(concat(" ", normalize-space(@class), " "), " entity-create-btn ")]'
     Entity One Form:
       selector: 'form[name="entity_one"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form

@@ -16,7 +16,9 @@ class <?= $short_class_name ?>ImportExportConfigurationProvider implements Impor
             ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_PROCESSOR_ALIAS => '<?= $alias ?>',
 <?php endif;?>
             ImportExportConfiguration::FIELD_EXPORT_PROCESSOR_ALIAS => '<?= $alias ?>',
+<?php if (!$disable_import): ?>
             ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_ALIAS => '<?= $alias ?>',
+<?php endif;?>
         ]);
     }
 }

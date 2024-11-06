@@ -43,6 +43,7 @@ Feature: Check generated entity in entity management
       | textField                  | Text            | Text Field                     | No        |
       | updatedAt                  | DateTime        | Updated At                     | No        |
       | wysiwygField               | WYSIWYG         | Wysiwyg Field                  | Yes       |
+      | readOnlyRelation           | System relation | Read Only Relation             | Yes       |
 
   Scenario: Check fields in View "Entity Two" entity
     When I go to System / Entities / Entity Management
@@ -81,6 +82,20 @@ Feature: Check generated entity in entity management
       | percentField | Float           | Percent Field |
       | textField    | Text            | Text Field    |
       | updatedAt    | DateTime        | Updated At    |
+
+  Scenario: Check fields in View "Entity Read Onlyd" entity
+    When I go to System / Entities / Entity Management
+    And I filter Name as contains "Entity"
+    And I click "View" on row "Entity Read Only" in grid
+    Then I should see following grid containing rows:
+      | Name                       | Data Type       | Label                          |
+      | createdAt                  | DateTime        | Created At                     |
+      | id                         | Integer         | ID                             |
+      | name                       | String          | Name                           |
+      | organization               | System relation | Organization                   |
+      | owner                      | System relation | Owner                          |
+      | readOnlyRelationEntityOnes | System relation | Read Only Relation Entity Ones |
+      | updatedAt                  | DateTime        | Updated At                     |
 
   Scenario: Check new field one_to_many_external_relation in Product in Entity Management
     When I go to System / Entities / Entity Management

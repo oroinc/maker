@@ -30,10 +30,8 @@ class ControllerGenerator implements GeneratorInterface
             );
 
             $entityClass = MetadataStorage::getClassName($entityName);
-            $formType = MetadataStorage::getClassMetadata($entityName, 'form_type');
             $uses = [
                 'Doctrine\Persistence\ManagerRegistry',
-                'Oro\Bundle\FormBundle\Model\UpdateHandlerFacade',
                 'Oro\Bundle\SecurityBundle\Attribute\Acl',
                 'Oro\Bundle\SecurityBundle\Attribute\AclAncestor',
                 'Sensio\Bundle\FrameworkExtraBundle\Configuration\Template',
@@ -42,9 +40,17 @@ class ControllerGenerator implements GeneratorInterface
                 'Symfony\Component\HttpFoundation\Request',
                 'Symfony\Component\Routing\Annotation\Route',
                 'Symfony\Contracts\Translation\TranslatorInterface',
-                $entityClass,
-                $formType
+                $entityClass
             ];
+
+            $isReadOnly = CrudHelper::isReadOnly($entityConfig);
+            $formType = MetadataStorage::getClassMetadata($entityName, 'form_type');
+            $formTypeShort = null;
+            if ($formType) {
+                $uses[] = $formType;
+                $uses[] = 'Oro\Bundle\FormBundle\Model\UpdateHandlerFacade';
+                $formTypeShort = Str::getShortClassName($formType);
+            }
 
             $entityAlias = Str::asSnakeCase($entityName);
             $detachActions = CrudHelper::getDetachActions($entityName, $entityConfig, $uses);
@@ -58,12 +64,13 @@ class ControllerGenerator implements GeneratorInterface
                 __DIR__ . '/../Resources/skeleton/crud/controller.tpl.php',
                 [
                     'is_crud_enabled' => CrudHelper::isCrudEnabled($entityConfig),
+                    'is_read_only' => $isReadOnly,
                     'entity_class' => $entityClass,
                     'template_path_prefix' => LocationMapper::getEntityTemplateTwigPathPrefix($shortClassName),
                     'short_class_name' => $shortClassName,
                     'entity_name' => $entityAlias,
                     'route_prefix' => $prefix,
-                    'form_type' => Str::getShortClassName($formType),
+                    'form_type' => $formTypeShort,
                     'uses' => $uses,
                     'saved_message' => TranslationHelper::getSaveMessage($configData, $entityName),
                     'detach_actions' => $detachActions
@@ -75,6 +82,7 @@ class ControllerGenerator implements GeneratorInterface
                 'index' => [
                     'grid_name' => MetadataStorage::getClassMetadata($entityName, 'grid_name'),
                     'create_acl' => $routes['create'],
+                    'allow_create' => !$isReadOnly,
                     'routes' => $routes,
                     'entity_label' => TranslationHelper::getEntityLabel($entityName),
                     'entity_plural_label' => TranslationHelper::getEntityPluralLabel($entityName),
@@ -87,8 +95,10 @@ class ControllerGenerator implements GeneratorInterface
                     'view_page_blocks' => CrudHelper::getViewPageBlocks($configData, $entityName),
                     'block_buttons' => CrudHelper::getViewPageButtons($configData, $entityName),
                     'page_id' => str_replace('_', '-', $prefix) . '-view',
-                ],
-                'update' => [
+                ]
+            ];
+            if (!$isReadOnly) {
+                $templates['update'] = [
                     'page_id' => str_replace('_', '-', $prefix) . '-edit',
                     'routes' => $routes,
                     'update_acl' => $routes['update'],
@@ -97,8 +107,8 @@ class ControllerGenerator implements GeneratorInterface
                     'entity_label' => TranslationHelper::getEntityLabel($entityName),
                     'entity_plural_label' => TranslationHelper::getEntityPluralLabel($entityName),
                     'update_page_blocks' => CrudHelper::getUpdatePageBlocks($configData, $entityName),
-                ],
-            ];
+                ];
+            }
 
             foreach ($templates as $template => $variables) {
                 $generator->generateFile(
