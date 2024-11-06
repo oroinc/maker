@@ -116,14 +116,21 @@ class OroEntityConfigHelper
         $routeNames = CrudHelper::getRouteNames($entityName);
         MetadataStorage::addClassMetadata($entityName, 'route_index', $routeNames['index']);
         MetadataStorage::addClassMetadata($entityName, 'route_view', $routeNames['view']);
-        MetadataStorage::addClassMetadata($entityName, 'route_create', $routeNames['create']);
-        MetadataStorage::addClassMetadata($entityName, 'route_update', $routeNames['update']);
+
+        if (!CrudHelper::isReadOnly($entityConfig)) {
+            MetadataStorage::addClassMetadata($entityName, 'route_create', $routeNames['create']);
+            MetadataStorage::addClassMetadata($entityName, 'route_update', $routeNames['update']);
+        }
 
         if (!CrudHelper::isCrudEnabled($entityConfig)) {
             return;
         }
         $config['routeName'] = $routeNames['index'];
         $config['routeView'] = $routeNames['view'];
+        if (CrudHelper::isReadOnly($entityConfig)) {
+            return;
+        }
+
         $config['routeCreate'] = $routeNames['create'];
         $config['routeUpdate'] = $routeNames['update'];
     }

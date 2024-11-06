@@ -11,7 +11,17 @@ Feature: Check generated code full
     And I click "Acme"
     Then I should see "Entity Ones"
     And I should see "Entity Twos"
+    And I should see "Entity Read Onlies"
     And I should not see "Entity Without Crud"
+
+  Scenario: Check read-only entity
+    When I go to Acme/Example/Entity Read Onlies
+    Then there is no records in grid
+    And I should not see "Create Entity Read Only"
+    And I should not see "Import file"
+    When I go to Acme/Example/Entity Ones
+    And I click "Create Entity One"
+    Then I should not see a "Entity Read Only Select Create Button" element
 
   Scenario: Check grid Entity before creation items
     When I go to Acme/Example/Entity Twos

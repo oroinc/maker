@@ -23,9 +23,13 @@ class MenuHelper
             if (!CrudHelper::isCrudEnabled($entityConfig)) {
                 continue;
             }
+            $isReadOnly = CrudHelper::isReadOnly($entityConfig);
             $entityAlias = Str::asSnakeCase($entityName);
             $alias = $prefix . '_list';
             $routes = CrudHelper::getRouteNames($entityName);
+            if ($isReadOnly) {
+                unset($routes['create'], $routes['update']);
+            }
 
             $menuItems[$alias] = [
                 'label' => TranslationHelper::getEntityPluralLabel($entityName),
@@ -35,16 +39,18 @@ class MenuHelper
             $menuTree[$appMenu]['children'][$orgTab]['children'][$pkgTab]['children'][$alias] = null;
 
             $titles[$routes['index']] = null;
-            $titles[$routes['create']] = 'oro.ui.create_entity';
             $titles[$routes['view']] = '%title% - oro.ui.view';
-            $titles[$routes['update']] = '%title% - oro.ui.edit';
+            if (!$isReadOnly) {
+                $titles[$routes['create']] = 'oro.ui.create_entity';
+                $titles[$routes['update']] = '%title% - oro.ui.edit';
 
-            $shortcutCreate = 'shortcut_' . $routes['create'];
-            $menuItems[$shortcutCreate] = [
-                'label' => TranslationHelper::getMenuCreateShortcutLabel($configData, $entityAlias),
-                'route' => $routes['create']
-            ];
-            $menuTree[$shortcutMenu]['children'][$shortcutCreate] = null;
+                $shortcutCreate = 'shortcut_' . $routes['create'];
+                $menuItems[$shortcutCreate] = [
+                    'label' => TranslationHelper::getMenuCreateShortcutLabel($configData, $entityAlias),
+                    'route' => $routes['create']
+                ];
+                $menuTree[$shortcutMenu]['children'][$shortcutCreate] = null;
+            }
 
             $shortcutList = 'shortcut_' . $routes['index'];
             $menuItems[$shortcutList] = [
