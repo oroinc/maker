@@ -122,9 +122,10 @@ final class ClassSourceManipulator
     public function addManyToOneRelation(
         RelationManyToOne $manyToOne,
         string $fieldName,
-        array $fieldConfig
+        array $fieldConfig,
+        string $relatedEntityPk = 'id'
     ): void {
-        $this->addSingularRelation($manyToOne, $fieldName, $fieldConfig);
+        $this->addSingularRelation($manyToOne, $fieldName, $fieldConfig, $relatedEntityPk);
     }
 
     public function addOneToManyRelation(
@@ -302,8 +303,12 @@ final class ClassSourceManipulator
         return $setterNodeBuilder;
     }
 
-    private function addSingularRelation(BaseRelation $relation, string $fieldName, array $fieldConfig): void
-    {
+    private function addSingularRelation(
+        BaseRelation $relation,
+        string $fieldName,
+        array $fieldConfig,
+        string $relatedEntityPk = 'id'
+    ): void {
         $typeHint = $this->addUseStatementIfNecessary($relation->getTargetClassName());
         if ($relation->getTargetClassName() == $this->getThisFullClassName()) {
             $typeHint = 'self';
@@ -332,13 +337,18 @@ final class ClassSourceManipulator
         );
 
         if ($relation->isOwning()) {
+            $options = [
+                'name' => Str::asSnakeCase($relation->getPropertyName()) . '_' . $relatedEntityPk,
+                'nullable' => $relation->isNullable(),
+                'onDelete' => $relation->isNullable() ? 'SET NULL' : 'CASCADE'
+            ];
+            if ($relatedEntityPk !== 'id') {
+                $options['referencedColumnName'] = $relatedEntityPk;
+            }
+
             $annotations[] = $this->annotationRenderer->getLines(
                 'ORM\\JoinColumn',
-                [
-                    'name' => Str::asSnakeCase($relation->getPropertyName()) . '_id',
-                    'nullable' => $relation->isNullable(),
-                    'onDelete' => $relation->isNullable() ? 'SET NULL' : 'CASCADE'
-                ]
+                $options
             );
         }
         if (!$relation->isOwning()) {

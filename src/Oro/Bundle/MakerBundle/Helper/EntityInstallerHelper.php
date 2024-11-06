@@ -243,10 +243,11 @@ class EntityInstallerHelper
     ): void {
         $tableName = MetadataStorage::getClassMetadata($entityName, 'table_name');
         $targetInfo = $this->getTargetTableInfo($fieldConfig);
+        $relationPkColumn = $targetInfo['pk_column_name'];
 
-        $tables[$tableName]['relations'][$relationName . '_id'] = [
+        $tables[$tableName]['relations'][$relationName . '_' . $relationPkColumn] = [
             'target_table_name' => $targetInfo['table_name'],
-            'target_pk_field_name' => $targetInfo['pk_field_name'],
+            'target_pk_field_name' => $relationPkColumn,
             'target_pk_type' => $targetInfo['pk_type'],
             'on_delete' => $fieldConfig['required'] ? 'CASCADE' : 'SET NULL',
             'options' => $this->getInstallerFieldOptions(OroEntityHelper::getFieldOptions($relationName, $fieldConfig))
@@ -427,6 +428,7 @@ class EntityInstallerHelper
         return [
             'table_name' => $tableName,
             'pk_field_name' => $idInfo['field_name'],
+            'pk_column_name' => $idInfo['column_name'],
             'pk_type' => $idInfo['field_type']
         ];
     }

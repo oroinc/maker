@@ -81,12 +81,13 @@ class CrudHelper
                         }
                     } elseif (str_ends_with($fieldConfig['relation_type'], 'to-one')) {
                         $target = $fieldConfig['relation_target'];
+                        $viewRoute = MetadataStorage::getClassMetadata($target, 'route_view');
                         $firstColumnFields[] = [
-                            'render_type' => 'entity_link',
+                            'render_type' => $viewRoute ? 'entity_link': 'text',
                             'name' => $name,
                             'label' => $label,
                             'field_expression' => self::getEntityTitleExpression($fieldExpr),
-                            'relation_view_route' => MetadataStorage::getClassMetadata($target, 'route_view')
+                            'relation_view_route' => $viewRoute
                         ];
                     }
 

@@ -34,6 +34,7 @@ Feature: Check generated entity in entity management
       | manyToOneExternalRelation  | System relation | Many To One External Relation  | Yes       |
       | manyToManyExternalRelation | System relation | Many To Many External Relation | Yes       |
       | manyToOneInternalRelation  | System relation | Many To One Internal Relation  | Yes       |
+      | relationWithNonStandardId  | System relation | Relation With Non Standard Id  | Yes       |
       | multienum_field            | Multi-Select    | Multienum Field                | Yes       |
       | organization               | System relation | Organization                   | Yes       |
       | owner                      | System relation | Owner                          | Yes       |

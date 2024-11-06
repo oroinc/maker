@@ -76,7 +76,7 @@ class DoctrineEntityGenerator implements GeneratorInterface
             MetadataStorage::addClassMetadata(
                 $entityFQCN,
                 'id_info',
-                ['field_name' => 'id', 'field_type' => 'integer']
+                ['field_name' => 'id', 'field_type' => 'integer', 'column_name' => 'id']
             );
 
             $repoClassDetails = $generator->createClassNameDetails(

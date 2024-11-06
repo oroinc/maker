@@ -113,6 +113,7 @@ Feature: Check generated code full
       | DateTime Field                | <DateTime:2018-07-01 11:00 AM> |
       | Many To One Internal Relation | NamePrefix<Count>              |
       | Many To One External Relation | <MTOER>                        |
+      | Relation With Non Standard Id | Ukraine                        |
       | Wysiwyg Field                 | TWYSIWYG                       |
       | Html Field                    | Html Field Text                |
     And I save and close form
@@ -130,6 +131,7 @@ Feature: Check generated code full
       | Date Field                    | Jul 1, 2018                                                                            |
       | Datetime Field                | Jul 1, 2018, 11:00 AM                                                                  |
       | Many To One External Relation | <MTOER>                                                                                |
+      | Relation With Non Standard Id | Ukraine                                                                                |
       | Boolean Field                 | No                                                                                     |
       | Many To One Internal Relation | NamePrefix<Count> FirstName<Count> MiddleName<Count> LastName<Count> NameSuffix<Count> |
       | Html Field                    | Html Field Text                                                                        |
@@ -144,12 +146,12 @@ Feature: Check generated code full
   Scenario: View Entity One in grid
     When I go to Acme/Example/Entity Ones
     Then I should see following grid:
-      | Integer Field | Float Field | Decimal Field | Smallint Field | Bigint Field | String Field | Enum Field | Date Field  | DateTime Field        | Boolean Field | MTOIR            | MTOER         | Owner    |
-      | 10            | 10.1        | 20            | 1              | 2            | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefix1      | John Doe      | John Doe |
-      | 10            | 10.1        | 20            | 1              | 2            | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefix2      | John Doe      | John Doe |
-      | 10            | 10.1        | 20            | 1              | 2            | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefix3      | John Doe      | John Doe |
-      | 10            | 10.1        | 20            | 1              | 2            | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefix4      | John Doe      | John Doe |
-      | 10            | 10.1        | 20            | 1              | 2            | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefixUpdate | Charlie Sheen | John Doe |
+      | Integer Field | Float Field | Decimal Field | Smallint Field | Bigint Field | RWNSI   | String Field | Enum Field | Date Field  | DateTime Field        | Boolean Field | MTOIR            | MTOER         | Owner    |
+      | 10            | 10.1        | 20            | 1              | 2            | Ukraine | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefix1      | John Doe      | John Doe |
+      | 10            | 10.1        | 20            | 1              | 2            | Ukraine | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefix2      | John Doe      | John Doe |
+      | 10            | 10.1        | 20            | 1              | 2            | Ukraine | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefix3      | John Doe      | John Doe |
+      | 10            | 10.1        | 20            | 1              | 2            | Ukraine | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefix4      | John Doe      | John Doe |
+      | 10            | 10.1        | 20            | 1              | 2            | Ukraine | String       | 1          | Jul 1, 2018 | Jul 1, 2018, 11:00 AM | No            | NamePrefixUpdate | Charlie Sheen | John Doe |
 
   Scenario: Edit Entity One
     When I go to Acme/Example/Entity Ones
@@ -168,6 +170,7 @@ Feature: Check generated code full
       | Date Field                    | <Date:Jul 1, 2022>     |
       | Boolean Field                 | True                   |
       | Many To One Internal Relation | NamePrefix1            |
+      | Relation With Non Standard Id | Poland                 |
       | Wysiwyg Field                 | TWYSIWYG update        |
       | Html Field                    | Html Field Text update |
     And I save and close form
@@ -184,6 +187,7 @@ Feature: Check generated code full
       | Multienum Field               | Refrigerator, TV                                         |
       | Date Field                    | Jul 1, 2022                                              |
       | Many To One External Relation | Charlie Sheen                                            |
+      | Relation With Non Standard Id | Poland                                                   |
       | Boolean Field                 | Yes                                                      |
       | Many To One Internal Relation | NamePrefix1 FirstName1 MiddleName1 LastName1 NameSuffix1 |
       | Html Field                    | Html Field Text update                                   |
