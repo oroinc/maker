@@ -8,8 +8,8 @@ namespace Oro\Bundle\MakerBundle\Renderer;
  */
 class AttributeRenderer
 {
-    private const string BLOCK_SYMBOL = '    ';
-    private const string DEFAULT_VALUES_KEY = 'defaultValues';
+    private const BLOCK_SYMBOL = '    ';
+    private const DEFAULT_VALUES_KEY = 'defaultValues';
 
     public function render(string $attribute, array $options = null): string
     {
