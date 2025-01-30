@@ -11,7 +11,7 @@ class AttributeRenderer
     private const string BLOCK_SYMBOL = '    ';
     private const string DEFAULT_VALUES_KEY = 'defaultValues';
 
-    public function render(string $attribute, array $options = null): string
+    public function render(string $attribute, ?array $options = null): string
     {
         return implode(
             PHP_EOL,
@@ -21,7 +21,7 @@ class AttributeRenderer
         ) . PHP_EOL;
     }
 
-    public function getLines(string $attribute, array $options = null, bool $singleLine = false): array
+    public function getLines(string $attribute, ?array $options = null, bool $singleLine = false): array
     {
         $rows = [
             '#[' . $attribute . '('
@@ -40,7 +40,7 @@ class AttributeRenderer
         }
     }
 
-    protected function renderValue(int $nestingLevel, array $options = null, bool $singleLine = false): array
+    protected function renderValue(int $nestingLevel, ?array $options = null, bool $singleLine = false): array
     {
         $rows = [];
         $i = 0;

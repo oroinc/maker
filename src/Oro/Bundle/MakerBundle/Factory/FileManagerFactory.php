@@ -28,7 +28,7 @@ class FileManagerFactory
 
     public function createFileManager(
         string $rootDirectory,
-        string $twigDefaultPath = null
+        ?string $twigDefaultPath = null
     ): FileManager {
         return new FileManager(
             $this->fs,

@@ -59,7 +59,7 @@ class MetadataStorage
         string $entityClass,
         string $key,
         mixed $value,
-        string $valueKey = null
+        ?string $valueKey = null
     ): void {
         $storedValue = self::getClassMetadata($entityClass, $key, []);
         if ($valueKey) {
@@ -139,7 +139,7 @@ class MetadataStorage
         return null;
     }
 
-    public static function appendGlobalMetadata(string $key, mixed $value, string $valueKey = null): void
+    public static function appendGlobalMetadata(string $key, mixed $value, ?string $valueKey = null): void
     {
         $storedValue = self::getGlobalMetadata($key, []);
         if ($valueKey) {
