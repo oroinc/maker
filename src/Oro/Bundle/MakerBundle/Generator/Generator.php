@@ -18,9 +18,9 @@ class Generator extends BaseGenerator
     private GeneratorTwigHelper $twigHelper;
 
     public function __construct(
-        FileManager                 $fileManager,
-        string                      $namespacePrefix,
-        ?PhpCompatUtil              $phpCompatUtil = null,
+        FileManager $fileManager,
+        string $namespacePrefix,
+        ?PhpCompatUtil $phpCompatUtil = null,
         ?TemplateComponentGenerator $templateComponentGenerator = null
     ) {
         $this->fileManager = $fileManager;
