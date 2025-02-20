@@ -10,7 +10,7 @@
   ],
   "autoload": {
     "psr-4": {"Oro\\Bundle\\MakerBundle\\": "src/Oro/Bundle/MakerBundle"},
-    "exclude-from-classmap": ["/Tests/"]
+    "exclude-from-classmap": ["**/Tests/"]
   },
   "require": {
     "oro/platform": "6.0.*",
