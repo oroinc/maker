@@ -47,8 +47,7 @@ Feature: Check generated code minimal
     And I should see "Show Entity Minimals"
 
   Scenario: Search in main org
-    When I click "Search"
-    And type "TestTitleUP" in "search"
+    When type "TestTitleUP" in "search"
     Then I should see 1 search suggestions
     When I click "Search Submit"
     Then I should be on Search Result page

@@ -211,8 +211,7 @@ Feature: Check generated code full
     And I should see "Show Entity Twos"
 
   Scenario: Search in main org
-    When I click "Search"
-    And type "NamePrefix3" in "search"
+    When type "NamePrefix3" in "search"
     Then I should see 2 search suggestions
     When I click "Search Submit"
     Then I should be on Search Result page
@@ -228,8 +227,7 @@ Feature: Check generated code full
       | NamePrefix3 FirstName3 MiddleName3 LastName3 NameSuffix3 | Entity Two |
 
   Scenario: Search by Entity One
-    When I click "Search"
-    And I select "Entity One" from search types
+    When I select "Entity One" from search types
     And type "NamePrefix3" in "search"
     Then I should see 1 search suggestions
     When I click "Search Submit"
@@ -262,8 +260,7 @@ Feature: Check generated code full
       | Html Field                    | Html Field Text                                          |
 
   Scenario: Search by Entity Two
-    When I click "Search"
-    And I select "Entity Two" from search types
+    When I select "Entity Two" from search types
     And type "NamePrefix3" in "search"
     Then I should see 1 search suggestions
     When I click "Search Submit"
