@@ -1264,8 +1264,8 @@ final class ClassSourceManipulator
     {
         foreach ($this->getClassNode()->stmts as $i => $node) {
             if ($node instanceof Node\Stmt\ClassMethod && strtolower($node->name->toString()) === strtolower(
-                    $methodName
-                )) {
+                $methodName
+            )) {
                 return $i;
             }
         }

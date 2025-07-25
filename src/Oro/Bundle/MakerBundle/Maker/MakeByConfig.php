@@ -26,7 +26,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Yaml\Yaml;
 
@@ -70,7 +69,7 @@ class MakeByConfig extends AbstractMaker
     public function configureDependencies(DependencyBuilder $dependencies)
     {
         $dependencies->addClassDependency(
-            Route::class,
+            \Symfony\Component\Routing\Attribute\Route::class,
             'router'
         );
 

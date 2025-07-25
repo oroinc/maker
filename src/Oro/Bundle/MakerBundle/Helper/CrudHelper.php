@@ -88,7 +88,7 @@ class CrudHelper
                         $target = $fieldConfig['relation_target'];
                         $viewRoute = MetadataStorage::getClassMetadata($target, 'route_view');
                         $firstColumnFields[] = [
-                            'render_type' => $viewRoute ? 'entity_link': 'text',
+                            'render_type' => $viewRoute ? 'entity_link' : 'text',
                             'name' => $name,
                             'label' => $label,
                             'field_expression' => self::getEntityTitleExpression($fieldExpr),
