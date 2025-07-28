@@ -39,7 +39,7 @@ class ControllerGenerator implements GeneratorInterface
                 'Symfony\Bundle\FrameworkBundle\Controller\AbstractController',
                 'Symfony\Component\HttpFoundation\RedirectResponse',
                 'Symfony\Component\HttpFoundation\Request',
-                'Symfony\Component\Routing\Annotation\Route',
+                'Symfony\Component\Routing\Attribute\Route',
                 'Symfony\Contracts\Translation\TranslatorInterface',
                 $entityClass
             ];

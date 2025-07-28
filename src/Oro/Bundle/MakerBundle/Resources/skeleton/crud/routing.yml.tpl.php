@@ -1,4 +1,4 @@
 <?= $route_prefix ?>:
     resource: "<?= $resource ?>"
-    type: annotation
+    type: attribute
     prefix: /<?= $prefix . PHP_EOL ?>
