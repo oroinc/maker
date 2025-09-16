@@ -12,7 +12,6 @@ use Oro\Bundle\MakerBundle\Helper\OroEntityHelper;
 use Oro\Bundle\MakerBundle\Metadata\MetadataStorage;
 use Oro\Bundle\MakerBundle\Renderer\CodeStyleFixer;
 use Oro\Bundle\MakerBundle\Util\LocationMapper;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\FileManager;
@@ -91,11 +90,6 @@ class MakeByConfig extends AbstractMaker
         $dependencies->addClassDependency(
             DoctrineBundle::class,
             'orm'
-        );
-
-        $dependencies->addClassDependency(
-            ParamConverter::class,
-            'annotations'
         );
     }
 

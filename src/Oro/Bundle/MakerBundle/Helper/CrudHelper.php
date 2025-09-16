@@ -331,7 +331,7 @@ class CrudHelper
         if ($detachActions) {
             $uses[] = 'Oro\Bundle\SecurityBundle\Attribute\CsrfProtection';
             $uses[] = 'Symfony\Component\HttpFoundation\JsonResponse';
-            $uses[] = 'Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter';
+            $uses[] = 'Symfony\Bridge\Doctrine\Attribute\MapEntity';
         }
 
         return $detachActions;

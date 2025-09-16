@@ -15,8 +15,6 @@ class <?= $class_name; ?> extends AbstractController
     /**
      * Detach <?= $detach_action['target_entity_class'] ?> from <?= $short_class_name . PHP_EOL ?>
      */
-    #[ParamConverter("holder", options: ["id" => "holderEntityId"])]
-    #[ParamConverter("entity", options: ["id" => "entityId"])]
     #[Route(
         path: "/{holderEntityId}/<?= str_replace('_', '-', $detach_action['plural_field_name']) ?>/{entityId}/detach",
         name: "<?= $detach_action['route_prefix'] ?>_detach",
@@ -26,7 +24,9 @@ class <?= $class_name; ?> extends AbstractController
     #[CsrfProtection]
     #[AclAncestor("<?= $route_prefix ?>_update")]
     public function <?= $detach_action['action_name'] ?>DetachAction(
+        #[MapEntity(mapping: ["holderEntityId" => "id"])]
         <?= $short_class_name ?> $holder,
+        #[MapEntity(mapping: ["entityId" => "id"])]
         <?= $detach_action['target_entity_class'] ?> $entity
     ): JsonResponse {
         $holder->remove<?= $detach_action['remove_method'] ?>($entity);
@@ -41,7 +41,7 @@ class <?= $class_name; ?> extends AbstractController
 <?php endforeach; ?>
 <?php if ($is_crud_enabled): ?>
     #[Route(path: "/", name: "index")]
-    #[Template]
+    #[Template('<?= $template_path_prefix ?>/index.html.twig')]
     #[AclAncestor("<?= $route_prefix ?>_view")]
     public function indexAction(): array
     {
@@ -51,7 +51,7 @@ class <?= $class_name; ?> extends AbstractController
     }
 
     #[Route(path: "/view/{id}", name: "view", requirements: ["id" => "\d+"])]
-    #[Template]
+    #[Template('<?= $template_path_prefix ?>/view.html.twig')]
     #[Acl(
         id: "<?= $route_prefix ?>_view",
         type: "entity",
@@ -92,7 +92,7 @@ class <?= $class_name; ?> extends AbstractController
      *
      */
     #[Route(path: "/update/{id}", name: "update", requirements: ["id" => "\d+"])]
-    #[Template]
+    #[Template('<?= $template_path_prefix ?>/update.html.twig')]
     #[Acl(
         id: "<?= $route_prefix ?>_update",
         type: "entity",

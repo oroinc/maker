@@ -35,7 +35,7 @@ class ControllerGenerator implements GeneratorInterface
                 'Doctrine\Persistence\ManagerRegistry',
                 'Oro\Bundle\SecurityBundle\Attribute\Acl',
                 'Oro\Bundle\SecurityBundle\Attribute\AclAncestor',
-                'Sensio\Bundle\FrameworkExtraBundle\Configuration\Template',
+                'Symfony\Bridge\Twig\Attribute\Template',
                 'Symfony\Bundle\FrameworkBundle\Controller\AbstractController',
                 'Symfony\Component\HttpFoundation\RedirectResponse',
                 'Symfony\Component\HttpFoundation\Request',
