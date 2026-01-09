@@ -1034,7 +1034,7 @@ final class ClassSourceManipulator
             case 'array':
             case 'simple_array':
             case 'json':
-            case 'json_array':
+            case 'json':
             case 'wysiwyg_properties':
                 return 'array';
 
