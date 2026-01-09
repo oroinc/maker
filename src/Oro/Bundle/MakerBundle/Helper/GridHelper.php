@@ -166,7 +166,8 @@ class GridHelper
                 if (!empty($entityConfig['configuration']['is_related_entity'])) {
                     MetadataStorage::addClassMetadata($entityName, 'relation_grid_name', $relationGridName);
                 }
-            } elseif ($relationType === 'one-to-many'
+            } elseif (
+                $relationType === 'one-to-many'
                 && !MetadataStorage::getClassMetadata($fieldConfig['relation_target'], 'is_internal')
             ) {
                 $field = str_replace('_', '-', Str::asSnakeCase($entityName));
@@ -619,7 +620,8 @@ class GridHelper
                 }
                 if ($fieldConfig['relation_type'] === 'many-to-one') {
                     $titleField = MetadataStorage::getClassMetadata($fieldConfig['relation_target'], 'entity_title');
-                    if (empty($this->addedRelation[$fieldConfig['relation_target'] . '::' . $fieldName])
+                    if (
+                        empty($this->addedRelation[$fieldConfig['relation_target'] . '::' . $fieldName])
                         || !$titleField
                     ) {
                         continue;

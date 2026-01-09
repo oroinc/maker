@@ -16,7 +16,7 @@ class <?= $class_name ?> extends AbstractType
 <?php foreach ($form_fields as $form_field => $typeOptions): ?>
             ->add(
                 '<?= $form_field ?>',
-                <?= $typeOptions['type'].'::class' ?>,
+                <?= $typeOptions['type'] . '::class' ?>,
                 <?= $typeOptions['options'] . PHP_EOL ?>
             )
 <?php endforeach; ?>

@@ -138,7 +138,8 @@ class EntityDependencyHelper
 
     protected static function addWebsiteAwareInterface(string $entityName, array $entityConfig): void
     {
-        if (array_key_exists('website', $entityConfig['fields'])
+        if (
+            array_key_exists('website', $entityConfig['fields'])
             && !empty($entityConfig['fields']['website']['relation_target'])
             && $entityConfig['fields']['website']['relation_target'] === 'Oro\Bundle\WebsiteBundle\Entity\Website'
         ) {

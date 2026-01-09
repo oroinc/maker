@@ -251,7 +251,8 @@ class OroEntityHelper
                     );
                     if (!$relation->getMapInverseRelation()) {
                         throw new \Exception(
-                            'Somehow a OneToMany relationship is being created, but the inverse side will not be mapped?'
+                            'Somehow a OneToMany relationship is being created,'
+                            . ' but the inverse side will not be mapped?'
                         );
                     }
                     $manipulator->addOneToManyRelation(

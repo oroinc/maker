@@ -42,7 +42,8 @@ class GeneratorConfiguration implements ConfigurationInterface
         foreach ($processedConfig['entities'] as $entityName => &$entityData) {
             foreach ($entityData['fields'] as $fieldName => &$fieldData) {
                 // Disable data_audit on field level if it is disabled on entity level
-                if (empty($fieldData['disable_data_audit'])
+                if (
+                    empty($fieldData['disable_data_audit'])
                     && empty($entityData['configuration']['auditable'])
                 ) {
                     $fieldData['disable_data_audit'] = true;
@@ -171,7 +172,8 @@ class GeneratorConfiguration implements ConfigurationInterface
                         ->defaultValue('string')
                         ->validate()
                             ->always(function ($type) {
-                                if (in_array($type, self::SUPPORTED_FIELD_TYPES, true)
+                                if (
+                                    in_array($type, self::SUPPORTED_FIELD_TYPES, true)
                                     || str_starts_with($type, '@')
                                     || str_contains($type, '\\')
                                 ) {

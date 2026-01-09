@@ -62,7 +62,8 @@ class SearchHelper
                 $fieldType = $fieldConfig['type'];
                 $name = Str::asLowerCamelCase($fieldName);
 
-                if (!in_array($fieldType, self::ALL_SCALAR_TYPES, true)
+                if (
+                    !in_array($fieldType, self::ALL_SCALAR_TYPES, true)
                     && $fieldType !== 'enum'
                     && $fieldType !== 'enum[]'
                     && $fieldType !== 'relation'

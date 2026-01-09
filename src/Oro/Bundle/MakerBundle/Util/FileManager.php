@@ -13,6 +13,6 @@ class FileManager extends BaseFileManager
     public function getRelativePathForFutureClass(string $className): ?string
     {
         return rtrim($this->getRootDirectory(), DIRECTORY_SEPARATOR)
-            . DIRECTORY_SEPARATOR . str_replace('\\', '/', $className).'.php';
+            . DIRECTORY_SEPARATOR . str_replace('\\', '/', $className) . '.php';
     }
 }

@@ -27,7 +27,8 @@ class EntityViewPageListenerGenerator implements GeneratorInterface
         $templatePathPrefix = LocationMapper::getTemplateTwigPathPrefix();
         foreach ($configData['entities'] as $entityName => $entityConfig) {
             foreach ($entityConfig['fields'] as $fieldName => $fieldConfig) {
-                if ($fieldConfig['type'] !== 'relation'
+                if (
+                    $fieldConfig['type'] !== 'relation'
                     || MetadataStorage::getClassMetadata($fieldConfig['relation_target'], 'is_internal', false)
                 ) {
                     continue;

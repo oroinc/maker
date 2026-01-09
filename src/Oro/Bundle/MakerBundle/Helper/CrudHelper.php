@@ -162,7 +162,7 @@ class CrudHelper
                     break;
                 case 'wysiwyg':
                     // skip for now to not introduce XSS
-                    // TODO: implement some kind of preview
+                    // It would be nice to implement some kind of preview
                     break;
 
                 case 'percent':
@@ -348,7 +348,8 @@ class CrudHelper
 
                 $targetEntityName = MetadataStorage::getAlias($fieldConfig['relation_target']);
                 $innerTarget = $configData['entities'][$targetEntityName];
-                if (empty($innerTarget['configuration']['is_related_entity'])
+                if (
+                    empty($innerTarget['configuration']['is_related_entity'])
                     || empty($innerTarget['configuration']['create_import_export'])
                 ) {
                     continue;
