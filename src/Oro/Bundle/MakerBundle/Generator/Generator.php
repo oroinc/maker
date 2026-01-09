@@ -12,6 +12,9 @@ use Symfony\Bundle\MakerBundle\Util\YamlManipulationFailedException;
 use Symfony\Bundle\MakerBundle\Util\YamlSourceManipulator;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Extends the Symfony MakerBundle generator with additional functionality for YAML file generation and manipulation.
+ */
 class Generator extends BaseGenerator
 {
     private FileManager $fileManager;
