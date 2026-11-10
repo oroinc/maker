@@ -377,7 +377,7 @@ Feature: Check generated code full
       | Percent Field (%) | t                                 |
     And I click "Submit"
     Then I should see validation errors:
-      | Percent Field (%) | Please enter a percentage value. |
+      | Percent Field (%) | This value is not a valid percentage. |
     When I fill form with:
       | Percent Field (%) | 15 |
     And I click "Submit"
